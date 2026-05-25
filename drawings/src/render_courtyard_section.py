@@ -124,7 +124,7 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
 
     # ---- Existing basement double-doors on south wall ----
     lower = dims["rear_wall"]["lower_basement"]
-    door_h = lower["door_pair_height_mm"]
+    door_h = lower["head_height_above_slab_mm"]
     ax.add_patch(Rectangle(w.p(cx1, courtyard_slab),
                            w.s(ext_t), w.s(door_h),
                            fc="#3d2a1a", ec="#000", lw=0.5))

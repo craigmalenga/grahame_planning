@@ -84,17 +84,37 @@ courtyard:
 rear_wall:
   total_width_mm: 3250        # = courtyard width
   lower_basement:
-    left_painted_cheek_mm: 720       # 72 cm white-painted brick stub (Grahame)
-    recess_width_mm: 1850            # 185 cm full recess width (Grahame)
-    right_painted_cheek_mm: 720      # 72 cm white-painted brick stub (Grahame)
-    _check_arithmetic: "720+1850+720 = 3290 mm (~329 cm) vs. courtyard width 3250 mm. 4 cm discrepancy: probably down to wall thickness rounding. Treat as approx."
-    door_pair_clear_width_mm: 1440   # 2 leaves x 720 mm (Grahame)
-    door_pair_height_mm: 2100        # _status: TBC head height
+    # CORRECTED per Craig (shared image 14 — re-examined 2026-05-25):
+    # The lower-basement opening in the recess is NOT a pair of doors —
+    # it is a SINGLE CENTRAL DOOR with a SASH WINDOW each side, all under
+    # one red-brick flat arch.  The two flanking side-windows have RAISED
+    # BRICK SILLS (so they don't extend all the way to the threshold).
+    left_painted_cheek_mm: 720       # 72 cm white-painted brick stub OUTSIDE the recess
+    recess_width_mm: 1850            # 185 cm — recess width (door + 2 side windows + reveals)
+    right_painted_cheek_mm: 720
+    _check_arithmetic: "720+1850+720 = 3290 mm (~329 cm) vs. courtyard width 3250 mm. ~4 cm tolerance / wall-thickness rounding."
+    # Composition WITHIN the 1850 mm recess (from left to right):
+    side_window_width_mm: 450        # each flanking sash (working estimate from photo)
+    side_window_raised_sill_height_mm: 600   # brick-sill panel below each side window
+    central_door_width_mm: 900       # central single door (working estimate)
+    inner_reveal_mm: 25              # frame reveal at each end + between
+    head_height_above_slab_mm: 2300  # head of door & side-window assembly above courtyard slab
+    head_to_white_line_mm: 2900      # 290 cm height of recess at white line (Grahame)
+    # Note: head_height < head_to_white_line because there's the flat-arch
+    # zone between the door head and the white-line above.
     threshold_level_above_slab_mm: 0
-    head_to_white_line_mm: 2900      # 290 cm height of recess at white line
+    _status_arithmetic: |
+      720 (left painted cheek) + 1850 (recess) + 720 (right painted cheek) = 3290 mm.
+      Within the recess: 25 + 450 (LSW) + 25 + 900 (door) + 25 + 450 (RSW) + 25 = 1900 mm.
+      Currently 50 mm over recess width — final widths to be re-measured on site.
     _grahame_82cm_note: |
-      Grahame's quoted "82 cm doorway up to balustrade elements" is interpreted
-      as the working clear-opening of one leaf-plus-frame, not the wall recess.
+      Grahame's "doorway/opening to balustrade elements 82 cm wide" most
+      plausibly refers to the central door clear-opening (with frame closer
+      to 90 cm).
+    _grahame_72cm_note: |
+      Grahame's "two rear doors symmetrical at 72 cm each side" originally
+      read as door leaves; per Craig's correction it actually refers to the
+      painted-brick cheek width OUTSIDE the recess (72 cm each side).
   upper_ground:
     sash_width_mm: 2100              # 210 cm wide — rear-reception window (Grahame)
     sash_height_mm: 2400             # head must be below 3280 ceiling; using 2400 (NOT 3000)
@@ -157,12 +177,36 @@ side_wall:
 # -----------------------------------------------------------------------------
 existing_services:
   downpipe_side_wall:
+    # Cast-iron downpipe on the SIDE wall (east wall of courtyard, kitchen-side)
+    # Visible in photo 16 + photo 14 (LEFT edge).
     diameter_mm: 90
     material: "cast iron, black-painted"
     position_from_north_corner_mm: 1500
     _status_position: "TBC: estimated from photo 16. Confirm by site survey."
     swan_neck_height_above_slab_mm: 3500
     note: "Currently crosses the line of the kitchen-window/door conversion — must be rerouted in the proposal."
+  downpipe_rear_wall_right:
+    # Cast-iron downpipe on the REAR wall (south wall of courtyard) — RIGHT side.
+    # Visible in photo 14 (RIGHT side of the door bay).
+    diameter_mm: 90
+    material: "cast iron, black-painted"
+    position_from_east_corner_mm: 2900    # near the east end (right side of door bay)
+    _status_position: "TBC: estimated from photo 14 — runs to the right of the central door."
+    swan_neck_height_above_slab_mm: 3200
+    note: "Existing downpipe on rear wall (right of door) — retain in proposal."
+  downpipe_rear_wall_left:
+    # Cast-iron downpipe on the REAR wall — LEFT inside-corner.
+    # Visible in photo 14 (LEFT edge of the rear-wall view — in the L corner).
+    diameter_mm: 90
+    material: "cast iron, black-painted"
+    position_from_east_corner_mm: 250     # close to the left edge of the rear wall
+    _status_position: "TBC: estimated from photo 14 — sits in the inside corner of the L."
+    swan_neck_height_above_slab_mm: 3200
+    note: |
+      Existing downpipe in the inside corner of the L.  The proposed spiral
+      staircase sits IN this corner, so this downpipe may need to be
+      rerouted/relocated to make space for the staircase base-plate and
+      tread envelope.  CONFIRM ON SITE.
 
 # -----------------------------------------------------------------------------
 # PROPOSED CHANGES — REAR / COURTYARD ELEVATION

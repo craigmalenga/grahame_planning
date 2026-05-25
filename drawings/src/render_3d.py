@@ -100,7 +100,7 @@ def render_courtyard_3d():
     cheek_l = lower["left_painted_cheek_mm"]
     cheek_r = lower["right_painted_cheek_mm"]
     rec_x0 = cheek_l
-    door_h = lower["door_pair_height_mm"]
+    door_h = lower["head_height_above_slab_mm"]
     # Lower portion: split into 3 pieces (left cheek, recess [door], right cheek)
     add_box(0, -ext_t, 0, cheek_l, ext_t, dims["courtyard"]["white_paint_datum_mm"], "#f0e8d8")
     add_box(rec_x0 + rec_w, -ext_t, 0, cheek_r, ext_t, dims["courtyard"]["white_paint_datum_mm"], "#f0e8d8")

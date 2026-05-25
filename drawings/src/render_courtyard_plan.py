@@ -101,41 +101,60 @@ def draw_courtyard_plan(ax, w, dims, *, show_existing=True, show_proposed=False,
             color="#555")
 
     # ---- REAR WALL openings shown in plan ----
-    # Lower-basement: recessed door bay — 720 cheek + 1850 recess + 720 cheek
+    # Recess containing CENTRAL DOOR + 2 FLANKING SASH WINDOWS
     rear_lower = dims["rear_wall"]["lower_basement"]
     cheek_l = rear_lower["left_painted_cheek_mm"]
     recess_w = rear_lower["recess_width_mm"]
     cheek_r = rear_lower["right_painted_cheek_mm"]
-    recess_depth = 250  # recessed into the wall by ~250 mm
+    sw_w = rear_lower["side_window_width_mm"]
+    door_w = rear_lower["central_door_width_mm"]
+    rev = rear_lower["inner_reveal_mm"]
     recess_x0 = cx0 + cheek_l
     recess_x1 = recess_x0 + recess_w
-    # The recess cuts into the wall (we show as a notch in the south wall)
+    # The recess plane (slight notch into the wall)
     ax.add_patch(Rectangle(w.p(recess_x0, cy0 - ext_wall_t),
                            w.s(recess_w), w.s(ext_wall_t),
                            fc="#f4ede0", ec="#000", lw=0.4))
-    # Door pair shown as 2 thin rectangles in the recess plane (in plan)
-    door_thickness = 40
-    door_leaf_w = recess_w / 2
-    for i in range(2):
-        dx = recess_x0 + i * door_leaf_w
-        # Door swinging into the courtyard (open ~30°) — schematic
-        ax.add_patch(Rectangle(w.p(dx, cy0 - 50),
-                               w.s(door_leaf_w - 50), w.s(door_thickness),
-                               fc="#8b6f47", ec="#000", lw=0.4))
-    # Swing arc indication
-    for i in range(2):
-        dx = recess_x0 + i * door_leaf_w
-        end_x = dx if i == 0 else dx + door_leaf_w
-        pivot_x = dx + door_leaf_w if i == 0 else dx
-        radius = door_leaf_w - 50
-        # quarter-circle arc swinging out into the courtyard
-        from matplotlib.patches import Arc
-        start_ang = 90 if i == 0 else 0
-        end_ang = 180 if i == 0 else 90
-        ax.add_patch(Arc(w.p(pivot_x, cy0 - 30),
-                         w.s(2 * radius), w.s(2 * radius),
-                         angle=0, theta1=start_ang, theta2=end_ang,
-                         color="#888", lw=0.3, linestyle=(0, (2, 2))))
+    # Position 3-part assembly centred within recess
+    asm_w = rev + sw_w + rev + door_w + rev + sw_w + rev
+    asm_x0 = recess_x0 + (recess_w - asm_w) / 2
+    # Left side window (fixed sash in plan = thin rectangle with glass line)
+    lsw_x0 = asm_x0 + rev
+    ax.add_patch(Rectangle(w.p(lsw_x0, cy0 - 80),
+                           w.s(sw_w), w.s(40),
+                           fc="#a8d5e8", ec="#000", lw=0.4))
+    # Central door — schematic single leaf swinging outward
+    door_x0 = lsw_x0 + sw_w + rev
+    from matplotlib.patches import Arc
+    ax.add_patch(Rectangle(w.p(door_x0, cy0 - 60),
+                           w.s(door_w - 50), w.s(40),
+                           fc="#8b6f47", ec="#000", lw=0.5))
+    # Swing arc (single leaf hinged on left, swing 90° outward)
+    ax.add_patch(Arc(w.p(door_x0, cy0 - 30),
+                     w.s(2 * (door_w - 50)), w.s(2 * (door_w - 50)),
+                     angle=0, theta1=180, theta2=270,
+                     color="#888", lw=0.3, linestyle=(0, (2, 2))))
+    # Right side window
+    rsw_x0 = door_x0 + door_w + rev
+    ax.add_patch(Rectangle(w.p(rsw_x0, cy0 - 80),
+                           w.s(sw_w), w.s(40),
+                           fc="#a8d5e8", ec="#000", lw=0.4))
+    # Annotation
+    ax.text(*w.p(door_x0 + door_w / 2, cy0 - 350),
+            "Central door + 2 flanking sash windows\n(all under one flat arch)",
+            fontsize=5, ha="center", va="top", style="italic", color="#444")
+
+    # Rear-wall downpipes (left corner + right of door)
+    rear_dp_r = dims["existing_services"]["downpipe_rear_wall_right"]
+    rear_dp_l = dims["existing_services"]["downpipe_rear_wall_left"]
+    from matplotlib.patches import Circle as _Circle
+    for dp, lab in [(rear_dp_r, "DP-R"), (rear_dp_l, "DP-L\n(L corner)")]:
+        dx = cx0 + dp["position_from_east_corner_mm"]
+        ax.add_patch(_Circle(w.p(dx, cy0 - ext_wall_t / 2),
+                             w.s(dp["diameter_mm"] / 2),
+                             fc="#000", ec="#000"))
+        ax.text(*w.p(dx, cy0 - ext_wall_t - 200),
+                lab, fontsize=4, ha="center", va="top", color="#333")
 
     # ---- SIDE WALL openings shown in plan ----
     # Lower-basement: 51 + 60(bricked) + 49 + 123(glass) + 17 = 300 cm sequence
