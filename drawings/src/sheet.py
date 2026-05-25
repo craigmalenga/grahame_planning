@@ -138,25 +138,35 @@ def new_a3_landscape(title: str, drawing_no: str, scale: Scale,
                     arrowprops=dict(arrowstyle="-|>", color="black", lw=1.2),
                     ha="center", va="center", fontsize=10, weight="bold")
 
-    # Scale bar bottom-left
-    sb_x, sb_y = 20, 15
-    bar_lengths_mm_world = [0, 1000, 2000, 3000, 4000, 5000]  # in world mm
-    bar_lengths_sheet = [v * scale.factor for v in bar_lengths_mm_world]
-    bar_h = 2
-    for i in range(len(bar_lengths_sheet) - 1):
-        x0 = sb_x + bar_lengths_sheet[i]
-        x1 = sb_x + bar_lengths_sheet[i + 1]
-        fill = "black" if i % 2 == 0 else "white"
-        ax.add_patch(Rectangle((x0, sb_y), x1 - x0, bar_h,
-                               fill=True, fc=fill, ec="black", lw=0.4))
-    for i, v in enumerate(bar_lengths_mm_world):
-        x = sb_x + bar_lengths_sheet[i]
-        ax.plot([x, x], [sb_y, sb_y - 1.5], color="black", lw=0.4)
-        ax.text(x, sb_y - 3, f"{v/1000:g}m", fontsize=5,
-                ha="center", va="top")
-    ax.text(sb_x + bar_lengths_sheet[-1] / 2, sb_y + bar_h + 1.5,
-            f"Scale 1:{scale.denominator}",
-            fontsize=6, ha="center", va="bottom")
+    # Scale bar bottom-left — only if scale is a proper drawing scale (denom > 1).
+    # At 1:1 the bar bars run wider than the sheet and turn into a thick black
+    # line obscuring the title block.
+    if scale.denominator > 1:
+        sb_x, sb_y = 20, 6
+        bar_lengths_mm_world = [0, 1000, 2000, 3000, 4000, 5000]  # in world mm
+        bar_lengths_sheet = [v * scale.factor for v in bar_lengths_mm_world]
+        # If the 5m bar overflows the available horizontal space (260mm before
+        # title block at ~270mm), reduce the number of segments.
+        max_len = 250
+        while bar_lengths_sheet and bar_lengths_sheet[-1] > max_len:
+            bar_lengths_mm_world.pop()
+            bar_lengths_sheet.pop()
+        bar_h = 2
+        for i in range(len(bar_lengths_sheet) - 1):
+            x0 = sb_x + bar_lengths_sheet[i]
+            x1 = sb_x + bar_lengths_sheet[i + 1]
+            fill = "black" if i % 2 == 0 else "white"
+            ax.add_patch(Rectangle((x0, sb_y), x1 - x0, bar_h,
+                                   fill=True, fc=fill, ec="black", lw=0.4))
+        for i, v in enumerate(bar_lengths_mm_world):
+            x = sb_x + bar_lengths_sheet[i]
+            ax.plot([x, x], [sb_y, sb_y - 1.2], color="black", lw=0.4)
+            ax.text(x, sb_y - 2.3, f"{v/1000:g}m", fontsize=5,
+                    ha="center", va="top")
+        if bar_lengths_sheet:
+            ax.text(sb_x + bar_lengths_sheet[-1] / 2, sb_y + bar_h + 1.5,
+                    f"Scale 1:{scale.denominator}",
+                    fontsize=6, ha="center", va="bottom")
 
     return fig, ax
 
