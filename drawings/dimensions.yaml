@@ -1,0 +1,343 @@
+# Flat 1, 20 Hornton Street, London W8 4NR
+# Measured / proposed dimensions for planning drawings
+#
+# ALL DIMENSIONS IN MILLIMETRES (mm) unless noted otherwise.
+#
+# Sources of truth (in priority order):
+#   1. job16873-1.pdf  (Real Estate Services, surveyed 12/2/2026 for HM Land Registry)
+#      - This is the only authoritative measured plan of No. 20 itself.
+#   2. Grahame Pearce's site measurements (read_me.,md and the Re_... .msg emails)
+#      - On-site tape-measure dimensions of openings, walls, the rear elevation,
+#        the courtyard, the spiral staircase, and the proposed bathroom.
+#   3. Photo analysis (photo_analysis.md) + Craig's verbal clarifications.
+#   4. Comparable applications — No. 24 (Savills 2007) and No. 30 (Rawspace 2014)
+#      Hornton Street — used only as precedent / typology references, NOT as
+#      dimensional source for No. 20.
+#
+# Edit any value here, then run `python3 drawings/src/render_all.py` to
+# regenerate every drawing.  Items marked "_status: TBC" are placeholders
+# pending site re-measure or clarification from Grahame.
+
+project:
+  title: "Flat 1, 20 Hornton Street, London W8 4NR"
+  client: "G. Pearce"
+  borough: "Royal Borough of Kensington and Chelsea"
+  conservation_area: "Kensington Conservation Area (to confirm)"
+  listed_building: true   # Grade II terrace — to confirm via RBKC list
+  rev: "A"
+  status: "FOR PLANNING — DRAFT"
+
+# -----------------------------------------------------------------------------
+# OVERALL FLAT ENVELOPE (from job16873-1)
+# -----------------------------------------------------------------------------
+flat_envelope:
+  basement:
+    length_mm: 19060          # 19.06 m front-to-back (incl. vaults under pavement)
+    width_mm: 5700            # 5.70 m
+    ceiling_heights_mm:
+      front_room: 2820        # patio area
+      bedrooms: 2760
+      rear_room: 2760
+      rear_basement_under_kitchen: 1890   # the small low-ceiling space
+  ground_floor:
+    length_mm: 13770          # 13.77 m (shorter than basement — no vaults)
+    width_mm: 4340            # 4.34 m
+    ceiling_heights_mm:
+      front_lightwell_zone: 2450
+      front_lounge: 3280
+      rear_reception: 3280
+      kitchen: 2450
+  total_storeys: 2            # Flat 1 = basement + ground
+
+# -----------------------------------------------------------------------------
+# REAR COURTYARD / LIGHTWELL
+# Sits at the rear-left of the ground-floor plan.  Open above to sky.
+# Bordered by:
+#   - SOUTH side (inward, toward dwelling): the wall to the rear reception room.
+#     Called the "REAR wall" here.  Contains the large rear-reception sash
+#     window (upper) + the recessed double-door bay (lower-basement).
+#   - EAST side (inward, toward kitchen): the wall to the kitchen.
+#     Called the "SIDE wall" / "LEFT wall" (as named by Craig and Grahame
+#     when standing in the courtyard looking back at the building).
+#     Contains the kitchen window (upper, ground floor) + two basement-level
+#     windows (60 cm bricked-up + 123 cm glass) at lower level.
+#   - WEST side: party / boundary wall with No. 22 — assumed solid brick, no
+#     openings.
+#   - NORTH side: rear property boundary — solid brick wall to ~3.5 m height.
+# -----------------------------------------------------------------------------
+courtyard:
+  plan_width_mm: 3250         # east-west, between boundary and kitchen wall (= 325 cm Grahame)
+  plan_depth_mm: 2950         # north-south, between rear-reception wall and rear boundary (= 295 cm Grahame)
+  slab_to_gf_ffl_mm: 2820     # courtyard slab to ground-floor finished floor level (= 2.82 m surveyor)
+  white_paint_datum_mm: 2900  # height of white-paint line on courtyard brickwork (Grahame)
+  rear_boundary_wall_height_mm: 3500
+  _status_boundary_height: "TBC: 3.5 m quoted in one email; confirm on site."
+  surface: "loose brick-dust / gravel over slab — to be made good / paved as part of works"
+  drainage_position:
+    _status: "TBC: position of gully / rain-water drain in patio not yet surveyed."
+
+# -----------------------------------------------------------------------------
+# REAR WALL (south wall of courtyard, ~325 cm wide)
+# Lower: recessed double-door bay (basement access from courtyard)
+# Upper: large rear-reception sash window (ground floor)
+# -----------------------------------------------------------------------------
+rear_wall:
+  total_width_mm: 3250        # = courtyard width
+  lower_basement:
+    left_painted_cheek_mm: 720       # 72 cm white-painted brick stub (Grahame)
+    recess_width_mm: 1850            # 185 cm full recess width (Grahame)
+    right_painted_cheek_mm: 720      # 72 cm white-painted brick stub (Grahame)
+    _check_arithmetic: "720+1850+720 = 3290 mm (~329 cm) vs. courtyard width 3250 mm. 4 cm discrepancy: probably down to wall thickness rounding. Treat as approx."
+    door_pair_clear_width_mm: 1440   # 2 leaves x 720 mm (Grahame)
+    door_pair_height_mm: 2100        # _status: TBC head height
+    threshold_level_above_slab_mm: 0
+    head_to_white_line_mm: 2900      # 290 cm height of recess at white line
+    _grahame_82cm_note: |
+      Grahame's quoted "82 cm doorway up to balustrade elements" is interpreted
+      as the working clear-opening of one leaf-plus-frame, not the wall recess.
+  upper_ground:
+    sash_width_mm: 2100              # 210 cm wide — rear-reception window (Grahame)
+    sash_height_mm: 2400             # head must be below 3280 ceiling; using 2400 (NOT 3000)
+    _status_sash_height: |
+      Grahame's email said "300-310 cm high"; that would put the head above the
+      3280 ceiling, which is impossible.  Plausible interpretation is that
+      this dimension is from courtyard slab to head (= 2820 + 80 sill + 2400
+      head = 5300 mm, close enough).  Using internal opening height 2400.
+      CONFIRM ON SITE.
+    sill_height_above_ffl_mm: 800    # 80 cm sill above interior floor (Grahame)
+    sill_height_above_courtyard_slab_mm: 3800  # 380 cm (Grahame, from courtyard)
+    head_height_above_courtyard_slab_mm: 6200  # = sill + height
+    horizontal_position_from_east_corner_mm: 575
+    _status_horizontal_position: "TBC: window position along the 325 cm wall — using 575 mm offset (centring approx 2100 wide window in 3250 wall)."
+
+# -----------------------------------------------------------------------------
+# SIDE WALL (east wall of courtyard, ~300 cm long)
+# Lower (basement level): TWO windows side-by-side along a 300 cm wall
+#   from north to south:  51 + 60(bricked) + 49(pier) + 123(glass) + 17
+# Upper (ground floor): ONE glass window — the kitchen window, to be
+#   converted into a doorway at the top of the spiral staircase.
+# -----------------------------------------------------------------------------
+side_wall:
+  total_length_mm: 3000              # = 300 cm (51+60+49+123+17 per Grahame)
+  _check_arithmetic: "300 cm vs. courtyard depth 295 cm — 5 cm tolerance / wall thickness."
+  lower_basement:
+    # Origin = north end of wall (rear boundary side). Distances run southward.
+    sequence_from_north_mm:
+      - { label: "solid brick",          length: 510 }
+      - { label: "bricked-up opening",   length: 600,  type: "blocked_window" }
+      - { label: "solid brick pier",     length: 490 }
+      - { label: "existing window (glass)", length: 1230, type: "window" }
+      - { label: "solid brick",          length: 170 }
+    both_openings_sill_height_above_slab_mm: 900    # 90 cm sill (Grahame)
+    both_openings_height_mm: 1600                   # 160 cm window height (Grahame)
+    both_openings_head_height_above_slab_mm: 2500   # 250 cm head — fits under 2760 basement ceiling
+  upper_ground:
+    # The kitchen window — to be extended/converted to a doorway
+    glass_gap_mm: 660                  # 66 cm of actual glass (Grahame)
+    structural_recess_width_mm: 900    # wider than glass; _status: TBC final figure
+    _status_recess: "Grahame said recess wider than 66 cm but didn't measure. Working estimate 900 mm."
+    sill_height_above_kitchen_ffl_mm: 720          # 72 cm sill (Grahame)
+    sill_height_above_courtyard_slab_mm: 3540      # 2820 (FFL) + 720 (sill)
+    _status_sill_grahame: |
+      Grahame quoted "372 cm" sill height above courtyard slab. Computed 354 cm.
+      18 cm discrepancy — likely slab thickness / boundary masonry / rounding.
+      Using 3540 as the computed figure for drawing consistency.
+    head_height_above_kitchen_ffl_mm: 2050         # _status: TBC; using 2050 to clear under 2450 ceiling
+    head_height_above_courtyard_slab_mm: 4870
+    horizontal_position_from_north_corner_mm: 2050
+    _status_horizontal_position: |
+      TBC: Grahame did not state position. Working estimate places the kitchen
+      window/doorway near the SOUTH end of the side wall so the new doorway
+      aligns vertically with the spiral-staircase centre (which is 950 mm from
+      the side wall = 2050 mm from the north corner of the 3000 mm side wall).
+      CONFIRM ON SITE.
+
+# -----------------------------------------------------------------------------
+# EXISTING SERVICES — to be rationalised
+# -----------------------------------------------------------------------------
+existing_services:
+  downpipe_side_wall:
+    diameter_mm: 90
+    material: "cast iron, black-painted"
+    position_from_north_corner_mm: 1500
+    _status_position: "TBC: estimated from photo 16. Confirm by site survey."
+    swan_neck_height_above_slab_mm: 3500
+    note: "Currently crosses the line of the kitchen-window/door conversion — must be rerouted in the proposal."
+
+# -----------------------------------------------------------------------------
+# PROPOSED CHANGES — REAR / COURTYARD ELEVATION
+# -----------------------------------------------------------------------------
+proposed:
+  # SIDE WALL UPPER: kitchen window converted to doorway
+  side_wall_upper_doorway:
+    threshold_level_above_kitchen_ffl_mm: 0        # door drops to kitchen-floor level
+    threshold_level_above_courtyard_slab_mm: 2820  # i.e. door head must equal staircase top of landing
+    head_height_above_kitchen_ffl_mm: 2050         # match existing window head
+    clear_width_mm: 800                            # 80 cm clear doorway (sufficient for access)
+    _status_width: "Subject to making-good and structural opening; pending engineer review."
+    _drop_amount_mm: 720
+    _drop_note: |
+      Grahame's email referred to "approximately 400 mm" of extension.  In
+      practice, a doorway needs the sill all the way down to FFL = 720 mm
+      drop, not 400 mm.  Treating 400 mm as Grahame's initial estimate and
+      using 720 mm to give a functional door.
+    door_style: "Vertically-proportioned 2-pane glazed timber door, white painted, with traditional reveal and slate threshold; head to match existing window head height for continuity."
+    making_good: "Match existing brick reveals; new red-brick flat arch / lintel detail to match the 1230 mm window below."
+  # SIDE WALL LOWER: bricked-up opening reinstated
+  side_wall_lower_reinstated_window:
+    opening_width_mm: 600
+    opening_height_mm: 1600
+    sill_height_above_slab_mm: 900
+    style: "Vertically-proportioned multi-pane sash, matching the 1230 mm window beside it in style, sill/head detail and finish."
+    note: "Reinstatement of previously blocked-up opening — historic fabric strongly suggests it was always glazed."
+  # REAR WALL UPPER: rear-reception window stays (no change in v1)
+  rear_wall_upper_window:
+    change: "Retain as existing (no change in v1)."
+  # REAR WALL LOWER: double-door bay reconfigured?
+  rear_wall_lower_doors:
+    change: "Retain as existing double-door access from courtyard to lower-basement (no change in v1)."
+  # SERVICES rationalised
+  downpipe:
+    new_position_from_north_corner_mm: 2950
+    note: "Re-route downpipe to clear the new doorway / staircase landing. Maintain black-painted cast iron character."
+  # SPIRAL STAIRCASE installed in inside corner of L
+  staircase_installation:
+    position: "Inside corner of the L (where side wall meets rear wall) within the courtyard"
+    centre_distance_from_side_wall_mm: 950
+    centre_distance_from_rear_wall_mm: 950
+    top_landing_level_above_courtyard_slab_mm: 2820   # = kitchen FFL
+    base_fixing: "Steel base-plate bolted to courtyard slab; final detail by engineer."
+    top_fixing: "Side-fixed to side wall + propped from staircase centre pole; final detail by engineer."
+
+# -----------------------------------------------------------------------------
+# SPIRAL STAIRCASE (reclaimed Victorian cast iron) — physical artefact
+# -----------------------------------------------------------------------------
+spiral_staircase:
+  n_treads: 14                       # 14 treads + top landing = 15 pads as counted by Grahame
+  _note_treads: "Grahame counted 15 pads; the top one acts as the landing-pad meeting the new doorway threshold. So 14 risers carry the rise."
+  tread_rise_mm: 201                 # 14 × 201 = 2814 mm ≈ 2820 mm kitchen FFL
+  total_rise_mm: 2814
+  central_pole_height_mm: 3300       # extends above landing as handrail post
+  central_pole_diameter_mm: 90
+  outer_radius_mm: 800               # 80 cm projection (Grahame)
+  envelope_radius_mm: 875            # ~175 cm overall diameter
+  tread_widest_mm: 340
+  tread_thickness_mm: 30
+  rotation_per_tread_deg: 25.7       # 360 / 14 = 25.7 — full revolution over the rise
+  start_angle_deg: 270               # first tread faces south-into-the-courtyard
+  finish: "dark painted cast iron, black ironwork"
+  handrail_height_mm: 900
+  # Position in the courtyard plan: centred 950 mm from each of side & rear walls
+  centre_position_mm:
+    from_side_wall: 950
+    from_rear_wall: 950
+
+# -----------------------------------------------------------------------------
+# INTERNAL: FRONT LOUNGE + REAR RECEPTION
+# Ground floor; ceiling 3.28 m.
+# -----------------------------------------------------------------------------
+front_lounge:
+  approx_room_width_mm: 4340         # = ground floor flat width
+  fireplace_wall_breakdown_mm: [1900, 1800, 1900]   # 190 / 180 / 190 around fireplace
+  # Grahame's far-left wall: "70 cm + 112 cm cut-out + 265 cm TOTAL"
+  # i.e. 700 mm solid + 1120 mm cut-out + 830 mm solid = 2650 mm total length.
+  far_left_wall_breakdown_mm: [700, 1120, 830]      # segments along the wall
+  far_left_wall_total_mm: 2650
+  ceiling_mm: 3280
+
+rear_reception:
+  approx_room_width_mm: 4340
+  side_wall_breakdown_mm: [650, 1120, 1500]         # 60-70 / 112 / 150
+  dividing_wall_thickness_mm: 100                   # 10 cm internal wall
+  fireplace_wall_breakdown_mm: [1450, 1840, 1460]   # 145 / 184(fireplace) / 146
+  rear_wall_window_offset_mm: 400                   # 40 cm side-wall-to-window
+  rear_wall_window_width_mm: 2100
+  rear_wall_window_end_pier_mm: 700                 # 70 cm to end of wall beyond window
+  width_difference_from_front_mm: 350               # rear ~35 cm wider than front
+  ceiling_mm: 3280
+
+internal_opening_between_rooms:
+  location: "Wall between front lounge and rear reception"
+  wall_thickness_mm: 100
+  existing:
+    _status: "TBC: as-found opening width/height not measured. Treating as approximately 1120 mm wide × ~2100 mm high based on far-left-wall 112 cm cut-out."
+    approx_width_mm: 1120
+    approx_height_mm: 2100
+  proposed:
+    nib_left_mm: 700                                # 70 cm retained nib (Grahame)
+    nib_right_mm: 600                               # 60 cm retained nib (Grahame)
+    height_mm: 2950                                 # 290-300 cm (Grahame)
+    _clear_width_calculation: |
+      The full wall length minus nibs (700 + 600 = 1300) gives the clear
+      opening. If the wall is 4340 - external_walls (~700) = ~3640, then
+      clear = ~2340 mm. _status: TBC site re-measure.
+    clear_width_mm: 2400
+    structural_note: "Subject to structural engineer design — steel beam with end pad-stones; final size & padstone widths by engineer."
+    making_good: "Make good plaster, skirting, cornicing and ceiling to match existing period detail to both rooms."
+
+# -----------------------------------------------------------------------------
+# KITCHEN + PROPOSED SHOWER ROOM
+# Ground floor; ceiling 2.45 m.
+# -----------------------------------------------------------------------------
+kitchen:
+  width_mm: 2400
+  length_window_side_mm: 2900        # to inner part of door
+  length_door_side_mm: 2750
+  length_opposite_side_mm: 2500      # wall slightly angled
+  ceiling_height_mm: 2450
+  rear_door_to_external_width_mm: 1000
+  rear_small_window:
+    width_mm: 480
+    height_mm: 1300
+    note: "Small window at far rear of kitchen, near rear door."
+
+proposed_shower_room:
+  available_length_mm: 2500
+  partition_thickness_mm: 100
+  zones:
+    shower_tray_width_mm: 1000
+    wc_zone_mm: 600
+    basin_zone_mm: 500
+    laundry_zone_width_mm: 600
+  door_type: "Pocket / sliding door"
+  pocket_door_clear_opening_mm: 700
+  glazed_doors_available:
+    width_mm: 1245
+    height_mm: 2245
+    note: "Available on-hand; possible reuse for the shower-room access if dimensionally feasible."
+  upstairs_shower_door:
+    model: "Merlyn Ionic Essence Black Hinged with Inline Panel (ex-display)"
+    width_mm: 940
+    height_mm: 2000
+    note: "For separate upstairs scheme — not part of this application."
+
+# -----------------------------------------------------------------------------
+# MATERIAL PALETTE — to be matched throughout
+# -----------------------------------------------------------------------------
+materials:
+  external:
+    brick_field: "yellow stock brick (match existing rear elevation)"
+    brick_arches: "red brick flat arches over openings (match existing)"
+    paint_below_datum: "white masonry paint up to 2900 mm white-line datum (match existing rear)"
+    sash_windows: "white-painted timber multi-pane sashes with glazing bars"
+    doors_external: "vertically-proportioned 2-pane glazed timber, white painted; slate or cast-iron thresholds"
+    metalwork: "black-painted cast iron — staircase, downpipes, railings"
+  internal:
+    plaster: "Lime-based plaster make-good to match existing finishes"
+    joinery: "Painted softwood — mouldings, architraves, skirting to match existing period detail"
+
+# -----------------------------------------------------------------------------
+# SOURCE CITATIONS
+# -----------------------------------------------------------------------------
+sources:
+  primary_plan: "job16873-1.pdf (Real Estate Services, 12 February 2026)"
+  primary_measurements: "read_me.,md (Grahame Pearce site measurements, May 2026) + Re_… .msg emails"
+  photos: "shared image (11)-(17).jpg"
+  precedents:
+    no_24_hornton_street: "24 hornton street plan*.pdf — Savills 2007 LB consent (LB 70979)"
+    no_30_hornton_street: "Document-*.pdf — Rawspace 2014 LB consent (LB/14/03475)"
+  reviews:
+    photo_analysis: "photo_analysis.md"
+    dimension_extraction: "extracted_dimensions.yaml"
+    dimension_questions: "dimension_questions.md"
+    pdf_inventory: "pdf_drawings_inventory.md"

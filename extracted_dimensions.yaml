@@ -1,0 +1,396 @@
+# =====================================================================
+# Flat 1, 20 Hornton Street, London W8 4NR
+# Consolidated dimension schedule for planning / listed building consent
+# All values transcribed from source materials in /home/user/grahame_planning/
+# Source codes used in citations:
+#   readme    = read_me.,md (Craig's compiled notes, with Grahame's quoted text)
+#   re_msg5   = "Re_ For what it is worth ... 5.msg" (rear elevation + basement doors)
+#   re_msg4   = "Re_ For what it is worth ... 4.msg" (lower ground bathrooms + patio)
+#   re_msg3   = "Re_ For what it is worth ... 3.msg" (front lounge + rear reception)
+#   re_msg2   = "Re_ For what it is worth ... 2.msg" (kitchen + proposed shower room)
+#   re_msg1   = "Re_ For what it is worth ... 1.msg" (spiral staircase summary)
+#   file1     = File1.msg (design strategy note - lintels/openings)
+#   file3     = File3.msg (Merlyn shower door reference)
+#   job16873  = job16873-1.pdf (Real Estate Services surveyed plan, Land Registry submission 12/2/2026)
+#   savills07 = "24 hornton street plan 2/3/4 + full application" (Savills 2007 — NB: 24 Hornton St,
+#               adjacent/similar property, NOT the subject site; included for context only)
+#   rawspace14 = Document-* (Rawspace 2014 listed building consent, 30 Hornton Street — also context only)
+# ALL DIMENSIONS APPROXIMATE/AS-MEASURED unless explicitly stated otherwise.
+# =====================================================================
+
+property:
+  address: "Flat 1, 20 Hornton Street, London W8 4NR"
+  listed_status: "Grade II listed (per draft Heritage Statement)"
+  conservation_area: "Kensington Conservation Area"
+  flat_arrangement: "Lower Ground Floor + Ground Floor maisonette"
+  units_note: "Dimensions throughout in cm unless suffixed m or mm."
+
+# ---------------------------------------------------------------------
+# Surveyed overall envelope (from Real Estate Services drawing, Feb 2026)
+# ---------------------------------------------------------------------
+overall_envelope:
+  source: job16873
+  drawing_ref: "REF 16873, dated 12/2/2026, scale 1:150 on A4 (surveyor MT)"
+  total_length_m:
+    front_to_back: 19.06       # along long axis, basement
+    note: "19.06 m noted along the long basement dimension"
+  ground_floor_length_m: 13.77 # noted on ground floor plan
+  width_m: 4.34                # internal width across the flat
+  ground_floor_heights_m:      # ceiling heights shown on plan
+    lightwell_upper_height: 2.45   # over upper / kitchen lightwell area
+    front_lounge_height: 3.28      # front reception
+    rear_reception_height: 3.28    # rear reception (matches)
+    note: "Front and rear reception both 3.28 m floor-to-ceiling"
+  basement_heights_m:
+    front_patio_height: 2.82
+    front_bedroom_height: 2.76
+    rear_bedroom_height: 2.76
+    vault_height: 1.89
+    rear_lightwell_open_height: 5.39  # height marked at the rear lightwell on basement plan
+    secondary_lightwell_dim_m: 2.94
+    long_dim_5_70: 5.70  # marked between basement spaces
+  conflict_note: |
+    job16873 records ground-floor reception ceilings at 3.28 m. re_msg3 quotes
+    a rear window head height of "approximately 300 cm to 310 cm high" which is
+    the WINDOW height, not ceiling height. The 290 cm "white line" in re_msg5
+    is a separate datum inside the rear lower-basement opening recess.
+
+# ---------------------------------------------------------------------
+# REAR ELEVATION — at ground-floor (kitchen / lightwell) level
+# This is the "key planning drawing". Measurements quoted left to right.
+# Includes: solid wall, bricked-up former window, pier, existing larger
+# window (to be extended down ~400 mm into a door), end of wall.
+# ---------------------------------------------------------------------
+rear_elevation_ground_floor:
+  source: [readme, re_msg5]
+
+  horizontal_sequence_left_to_right_cm:
+    - segment: "solid wall (left return)"
+      width: 51
+    - segment: "bricked-up former window/opening (to be REINSTATED)"
+      width: 60
+    - segment: "solid pier between openings"
+      width: 49
+    - segment: "existing larger window (to be EXTENDED ~400 mm down to form door)"
+      width: 123
+    - segment: "solid wall to right-hand end"
+      width: 17
+  total_run_check_cm: 300   # 51+60+49+123+17 = 300 (rear elevation horizontal total)
+
+  vertical_geometry_cm:
+    height_under_both_sills: 90    # from floor to underside of sill
+    both_opening_heights: 160      # both openings (bricked + existing window) 160 cm tall
+    sill_level_kitchen_window_to_become_door:
+      value: 372
+      definition: "height to sill (including the sill itself) from the lower
+                   reference level Grahame used (described as 'to sill')"
+    sill_level_rear_windows:
+      value: 380
+      definition: "the other rear windows' sill is roughly 380 cm — about
+                   8 cm higher than the kitchen window-to-become-door"
+    sill_level_difference_cm: 8
+
+  intended_changes:
+    - "Bricked-up former opening (60 cm wide x 160 cm tall) to be reinstated as a window/opening."
+    - "Existing larger window (123 cm wide x 160 cm tall, sill at ~372 cm) to be extended downward by approximately 400 mm and converted to a door for spiral-staircase access."
+    - "Sill/head/reveal detailing to match surrounding fabric; making-good to masonry."
+    - "Rationalise downpipes / external services."
+
+  ambiguity_flags:
+    - "372 cm and 380 cm are unusually high numbers — these almost certainly describe height ABOVE the lower-ground patio / lightwell floor (i.e. the sill is ~3.72 m above the basement courtyard level, which is consistent with the staircase rise of ~3.0 m). They are NOT measured from the kitchen floor."
+    - "The 51/60/49/123/17 = 300 cm total appears to refer ONLY to the kitchen-rear-wall portion of the elevation, not the full rear elevation of the flat. Confirm with Craig."
+
+# ---------------------------------------------------------------------
+# REAR ELEVATION — lower basement (the double doors below)
+# This is the bottom of the L-shape, looking at the wider rear doors.
+# ---------------------------------------------------------------------
+lower_basement_doors:
+  source: [readme, re_msg5]
+  rear_doors_pair:
+    each_leaf_width_cm: 72            # symmetrical, 72 cm each side
+    total_door_pair_width_cm: 144     # 72 + 72 (implied)
+  sill_height_cm: 80                  # from the basement/courtyard floor
+  opening_above_doors_to_balustrade_cm: 82  # "doorway/opening up to the small wooden balustrade elements"
+  overall_recess_width_cm: 185        # full rear opening/recess width
+  height_to_white_line_above_cm: 290  # internal head / lintel band above
+  protruding_wall_note:
+    location: "right-hand side, facing rear doors from inside"
+    approx_height_above_floor_m: 2.0
+    description: "small protruding section of wall higher up — Grahame to send photo"
+
+# ---------------------------------------------------------------------
+# REAR PATIO / LIGHTWELL (the L-shaped courtyard)
+# ---------------------------------------------------------------------
+courtyard:
+  source: [readme, re_msg4, re_msg1]
+  plan_dimensions_cm:
+    width: 325
+    depth: 295
+  rear_boundary_wall_height_cm: 350
+  rear_boundary_wall_purpose_note: "Materially screens the patio from overlooking — relevant to privacy/overlooking assessment in planning."
+  shape: "L-shape (NOT a rectangular box). The kitchen/upper level sits at the corner of the L; the wider lower-basement rear doors occupy the longer face."
+  key_geometry_intent:
+    - "Spiral staircase to sit in the corner of the L-shape, NOT in the middle of a flat wall."
+    - "The double doors at lower-basement level have approximately equal clearance left and right (per Craig's correction to ChatGPT)."
+    - "The upper-floor left side of the L (kitchen end) currently has the bricked-in opening below and existing window above — the planning intent converts the upper to a doorway."
+
+# ---------------------------------------------------------------------
+# RECEIVED RISE / SPIRAL STAIRCASE
+# ---------------------------------------------------------------------
+spiral_staircase:
+  source: [readme, re_msg1]
+  origin: "Reclaimed Victorian cast iron, dark / black painted finish"
+  treads_count_approx: 15
+  tread_rise_mm: [200, 210]   # 200-210 mm per tread
+  estimated_total_rise_m: [3.00, 3.15]
+  central_pole_height_m: 3.3
+  tread_projection_cm: 80     # from inner pole to outer edge
+  tread_diagonal_depth_cm: [80, 85]
+  tread_width_at_widest_cm: 34
+  external_diameter_cm: 160
+  practical_circular_envelope_cm: [165, 170]
+  recommended_layout_envelope_cm: [170, 175]
+  required_rise_assumption_m: [2.9, 3.1]
+  fits_within_courtyard_check:
+    courtyard_w_cm: 325
+    courtyard_d_cm: 295
+    note: "Fits geometrically; needs site-test against new door, drainage, wall clearances, landing height."
+  notes:
+    - "If actual rise differs from staircase length, allow for small plinth / landing piece."
+    - "Treat top connection as needing a landing/platform if it does not exactly meet threshold."
+
+# ---------------------------------------------------------------------
+# INTERNAL OPENING between front and rear reception rooms
+# ---------------------------------------------------------------------
+internal_opening_reception_rooms:
+  source: [readme, re_msg3]
+  existing:
+    internal_wall_thickness_cm: 10
+    existing_opening_description: "Existing doorway between front lounge and rear reception (to be enlarged into an open opening)."
+  proposed:
+    nibs_retained_cm:
+      one_side: 70
+      other_side: 60
+    proposed_opening_height_cm: [290, 300]  # "290 to 3 m height"
+    structural_note: "Beam / lintel zone subject to structural engineer design and Building Control approval."
+  context_geometry:
+    front_lounge_width_offset_vs_rear_room_cm: 35  # rear room ~35 cm wider than front lounge (because hallway reduces front lounge width)
+  ambiguity_flags:
+    - "Proposed opening WIDTH not explicitly stated by Grahame — derived only via the 60+70 nibs and the available wall length. Confirm clear opening width with Craig."
+
+# ---------------------------------------------------------------------
+# FRONT LOUNGE / RECEPTION ROOM
+# ---------------------------------------------------------------------
+front_lounge:
+  source: [readme, re_msg3]
+  fireplace_wall_breakdown_cm:        # facing the front of the house
+    - 190    # wall section 1
+    - 180    # fireplace
+    - 190    # wall section 2
+    note: "Broadly balanced around the fireplace; subject to final survey."
+  side_wall_far_left_cm:
+    - segment: "wall section"
+      length: 70
+    - segment: "cut-out / opening"
+      length: 112
+    - segment: "total wall length (including the above)"
+      length: 265
+  ceiling_height_m: 3.28   # from job16873
+
+# ---------------------------------------------------------------------
+# REAR RECEPTION ROOM (the one facing the rear/garden, before the kitchen wall)
+# ---------------------------------------------------------------------
+rear_reception:
+  source: [readme, re_msg3]
+  approx_width_at_dividing_wall_cm: 300
+  width_relative_to_front_lounge_cm: "+35 (wider)"
+  side_wall_breakdown_cm:            # moving from front-lounge side through into rear reception
+    - segment: "wall section"
+      length: [60, 70]
+    - segment: "opening / cut-out"
+      length: 112
+    - segment: "wall section"
+      length: 150
+    - segment: "dividing wall to be removed/opened (then into kitchen-facing area)"
+      length: null
+    - segment: "wall section on the other side"
+      length: 140
+  fireplace_wall_breakdown_cm:        # left-hand wall facing rear/garden
+    - segment: "wall section"
+      length: 145
+    - segment: "fireplace"
+      length: 184
+    - segment: "wall section"
+      length: 146
+    total_check_cm: 475   # 145+184+146
+  rear_window_wall:
+    side_clearance_to_window_cm: 40   # between side wall/opening and window
+    window_width_cm: 210
+    window_height_cm: [300, 310]
+    window_sill_height_cm: 80         # from floor level
+    end_pier_clearance_cm: 70         # beyond window — includes end pier/pillar
+  ceiling_height_m: 3.28
+
+# ---------------------------------------------------------------------
+# KITCHEN / REAR ROOM (upper / ground floor)
+# ---------------------------------------------------------------------
+kitchen:
+  source: [readme, re_msg2]
+  approx_width_cm: 240
+  ceiling_height_cm: 245
+  ceiling_height_check_vs_job16873: "Consistent with job16873's 2.45 m at this point."
+  wall_lengths_cm:
+    window_side_to_door_inner: 290    # kitchen wall on the window side, to inner part of door
+    rear_door_side_total: 275         # rear door / opening side
+    opposite_side_angled: 250         # opposite side — wall is slightly angled
+  rear_door_in_kitchen_cm:
+    width: 100
+  small_rear_window_right_hand:
+    width_cm: 48
+    height_cm: 130
+  window_to_be_converted_to_door:    # the upper "kitchen window" that becomes a door over the staircase
+    actual_glass_gap_cm: 66
+    structural_recess_width: "wider than 66 cm (not measured numerically by Grahame)"
+    sill_height_above_kitchen_floor_cm: 72
+
+# ---------------------------------------------------------------------
+# PROPOSED SHOWER ROOM / UTILITY (within the angled 250 cm wall run in kitchen)
+# ---------------------------------------------------------------------
+proposed_shower_room:
+  source: [readme, re_msg2]
+  available_wall_run_cm: 250
+  proposed_layout_left_to_right:
+    - "Shower (right-hand side of the proposed new door/opening down to spiral staircase)"
+    - "WC + basin within same compact room"
+    - "Stacked or side-by-side washing machine / tumble dryer at far end"
+  shower_tray_width_cm: 100        # plus new partition wall thickness
+  laundry_zone_width_cm: 60
+  remaining_for_shower_room_cm: 190   # 250 - 60 = 190 (per Grahame's arithmetic)
+  door_strategy: "Pocket / sliding door (not outward-opening) to preserve space"
+  wc_position_hint: "Toilet may work best backing onto wall adjoining kitchen (plumbing/services route)"
+  glazed_doors_available_for_reuse:
+    description: "Crystal / glazed doors"
+    width_cm: 124.5
+    height_cm: 224.5
+  open_questions_for_plan_test:
+    - "Can 100 cm shower tray + WC + basin fit within available width?"
+    - "Can laundry appliances still sit at the end?"
+    - "Can pocket / sliding door be accommodated?"
+    - "Required partition wall thickness?"
+    - "Can 124.5 x 224.5 cm glazed doors be cleanly incorporated?"
+    - "Does the new staircase door align with the existing window/recess?"
+
+# ---------------------------------------------------------------------
+# UPSTAIRS / UPPER BATHROOM
+# ---------------------------------------------------------------------
+upper_bathroom_shower:
+  source: [file3, readme]
+  fitting:
+    product: "Merlyn Ionic Essence Black Hinged Shower Door with Inline Panel"
+    code: "QS-V115607"
+    door_size_mm: "940 x 2000"
+    finish: "Black"
+    condition: "Ex Display, £75"
+    intended_location: "Upstairs"
+
+# ---------------------------------------------------------------------
+# LOWER GROUND FLOOR BATHROOMS
+# ---------------------------------------------------------------------
+lower_ground_bathrooms:
+  source: [re_msg4]
+  larger_bathroom:
+    width_cm: 220
+    depth_cm: 200
+    facing: "from the doorway looking in"
+  en_suite_bathroom:
+    width_cm: 196
+    depth_cm: 195
+    note: "Almost a perfect square; accessed from bedroom facing the patio"
+
+# ---------------------------------------------------------------------
+# DESIGN STRATEGY NOTES (non-dimensional but planning-critical)
+# ---------------------------------------------------------------------
+design_strategy:
+  source: [file1, readme]
+  principles:
+    - "Retain open rear lightwell — no infill or covering."
+    - "Reinstate the bricked-up former window as a window/opening (heritage benefit)."
+    - "Convert existing larger rear window into doors using EXISTING lintel/opening width where possible — avoid new openings that disrupt rhythm."
+    - "Form a continuous or partial landing/platform along the wall below the window line; spiral staircase rises along the side wall in the corner of the L-shape, not centred in the patio."
+    - "Lower-ground existing opening (current double-door arrangement) potentially reformed as a proper pair of doors within existing lintel width."
+    - "Rationalise downpipes / external services."
+    - "Reclaimed Victorian cast iron spiral staircase, restored in dark / black painted ironwork."
+    - "Internal reception-room opening: 60 + 70 cm nibs, 290–300 cm high; subject to structural engineer."
+  expressed_concerns_for_chatgpt_failures:
+    - "ChatGPT 3D renderings flattened the L-shape courtyard into a single flat wall — incorrect."
+    - "Spiral staircase must be in the corner / mid-way between the two perpendicular walls of the L."
+    - "Double-door at lower basement has equal clearance to left wall and right wall (not skewed)."
+    - "Upper left-hand of L-shape currently has NO window — it is bricked-in; to be opened up as a doorway."
+
+# ---------------------------------------------------------------------
+# CONTEXTUAL DATA FROM OTHER PROPERTIES (NOT THE SUBJECT SITE)
+# Included only because file names reference them; should NOT be used
+# directly as 20 Hornton Street dimensions.
+# ---------------------------------------------------------------------
+contextual_only_other_properties:
+  - source: rawspace14
+    address: "30 Hornton Street, London W8 4NR"
+    notes: |
+      Document-0C57AD4F3AEE4AA558DF57C9E0DB2519.pdf and the two
+      Document-C747CBFCB817A564F8179992856FB177*.pdf files relate to
+      Rawspace's June 2014 LB consent (Ref LB/14/03475) at 30 Hornton Street
+      for Ms H. O'Shea — alterations including blocking a door opening,
+      removing a chimney-breast wall and forming a structural door opening.
+    indicative_dimensions_observed_on_drawings_mm:
+      previously_approved_door_elevation_height: 2500
+      previously_approved_door_elevation_width: 1560
+      proposed_door_elevation_height: 2500
+      proposed_door_elevation_breakdown:
+        nib_left: 920
+        opening_clear: 1365
+        nib_right: 1005
+        head_to_ceiling: 730
+        head_height_above_floor: 1930
+    usefulness: "Useful precedent for the SCALE of a similar opening
+                 between two reception rooms on Hornton Street."
+  - source: savills07
+    address: "24 Hornton Street, London W8 4NR"
+    notes: |
+      Savills (Phillimore 1964 Settlement) April 2007 LB consent application —
+      renewal of roof coverings, damp-proofing works to basement & pavement vaults,
+      internal refurbishment of Flat 1. Useful precedent on a directly comparable
+      adjacent property.
+    indicative_dimensions_from_arch_drawing_mm:
+      hardwood_screen_arch_chord_width: 1000     # spring of arch on Section A-A
+      hardwood_screen_height_above: 375          # over arch
+    usefulness: "Floor plan layout (Bedroom 1/2/3, Bath 1/2, Kitchen, Lounge,
+                 Pavement vaults) is structurally similar to 20 Hornton St — useful
+                 as a planning precedent on the same street."
+
+# ---------------------------------------------------------------------
+# DOOR / FINISH SCHEDULE
+# ---------------------------------------------------------------------
+doors_and_finishes:
+  - location: "Upstairs bathroom"
+    type: "Merlyn Ionic Essence Hinged Shower Door + Inline Panel"
+    finish: "Black"
+    size_mm: "940 x 2000"
+    source: file3
+  - location: "Proposed shower room / utility (lower ground)"
+    type: "Reused crystal / glazed doors"
+    size_cm: "124.5 W x 224.5 H"
+    source: re_msg2
+  - location: "Spiral staircase"
+    type: "Reclaimed Victorian cast iron"
+    finish: "Dark / black painted ironwork"
+    source: [readme, re_msg1]
+  - location: "Proposed rear lower-basement doors"
+    type: "Pair of doors within existing lintel/opening (to match existing double-door style)"
+    each_leaf_width_cm: 72
+    pair_total_width_cm: 144
+    sill_height_cm: 80
+    source: [readme, re_msg5, file1]
+  - location: "Proposed new door at former kitchen-window position"
+    type: "Glazed door, traditional detailing"
+    formed_from: "Existing 123 cm wide x 160 cm tall window opening, extended downward by ~400 mm to give a door"
+    source: [readme, re_msg5]
