@@ -208,7 +208,7 @@ def draw_kitchen_plan(ax, w, dims, proposed=True, ox=0, oy=0):
 
 def render(proposed=True, dwg_no="08-A"):
     dims = load_dims()
-    scale = Scale(50)
+    scale = Scale(20)   # Rev C uplift for the cramped bathroom strip
     title = ("PROPOSED KITCHEN + COMPACT SHOWER-ROOM PLAN"
              if proposed else "EXISTING KITCHEN PLAN")
     fig, ax = new_a3_landscape(
@@ -219,17 +219,21 @@ def render(proposed=True, dwg_no="08-A"):
         show_north_arrow=True,
         north_rotation_deg=-45,
     )
-    w = World(ax, scale, origin_sheet_xy=(90, 110))
+    from sheet import auto_origin
+    ox, oy = auto_origin(dims["kitchen"]["length_window_side_mm"] + 1500,
+                          dims["kitchen"]["width_mm"] + 1500, scale)
+    ox += 800 * scale.factor; oy += 800 * scale.factor
+    w = World(ax, scale, origin_sheet_xy=(ox, oy))
     draw_kitchen_plan(ax, w, dims, proposed=proposed)
 
     notes = [
         "NOTES — KITCHEN + SHOWER ROOM",
         "1. Kitchen 2400 × 2900; ceiling 2450 mm.",
         "2. PROPOSED compact shower-room arrangement:",
-        "   • Shower tray 1000 mm",
-        "   • WC zone 600 mm",
-        "   • Basin zone 500 mm",
-        "   • Laundry (W/D) 600 mm",
+        "   • Shower tray 900 mm",
+        "   • WC zone 500 mm",
+        "   • Basin zone 400 mm",
+        "   • Laundry (single front-loader) 400 mm",
         "   • New 100 mm partition wall — pocket door.",
         "3. Crystal/glazed doors on hand (1245 × 2245 mm)",
         "   may be reused — check fit on site.",

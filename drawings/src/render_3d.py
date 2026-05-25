@@ -307,7 +307,7 @@ def render_bathroom_3d():
     x += 500 + 100
     # Laundry
     add_box(x, 0, 30, 600, 600, 850, "#cccccc")    # washer
-    add_box(x, 0, 900, 600, 600, 800, "#cccccc")    # dryer stacked
+    # Rev B: single front-loader, no stacked dryer.
 
     pc = Poly3DCollection(polys, facecolors=colors, edgecolors="#000",
                           linewidths=0.25, alpha=0.95)
@@ -337,8 +337,8 @@ def render_bathroom_3d():
     notes = [
         "FITTINGS (left → right)",
         "• Shower 1000 × 900 with full-height black",
-        "  hinged glazed panel (Merlyn Ionic Essence",
-        "  Black 940 × 2000 OR equivalent).",
+        "  hinged glazed panel (matt-black framed,",
+        "  ~900 × 2000 walk-in panel).",
         "• WC: low-level cistern with concealed",
         "  service voids where possible.",
         "• Compact basin on pedestal (450-500 mm).",

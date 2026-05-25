@@ -64,7 +64,7 @@ def render(dwg_no="06"):
     # Elevation dimensions
     dim_vertical(ax, w_elev, 0, params.total_rise_mm,
                  -params.envelope_radius_mm - 250,
-                 label=f"{params.total_rise_mm}\ntotal rise\n(14 x 201)")
+                 label=f"{params.total_rise_mm}\ntotal rise\n(15 × 200)")
     dim_vertical(ax, w_elev, 0, params.central_pole_height_mm,
                  -params.envelope_radius_mm - 600,
                  label=f"{params.central_pole_height_mm}\ncentre\npole")
@@ -104,8 +104,8 @@ def render(dwg_no="06"):
 
     schedule_lines = [
         ("SCHEDULE", True, 8),
-        (f"Treads / pads:        {params.n_treads + 1}  (14 risers + landing pad)", False, 7),
-        (f"Rise per tread:       {params.tread_rise_mm} mm  (200-210 verified)", False, 7),
+        (f"Risers:               {params.n_treads}  (15 risers fitting 3000 mm rise)", False, 7),
+        (f"Rise per tread:       {params.tread_rise_mm} mm  (200-210 verified on artefact)", False, 7),
         (f"Total rise:           {params.total_rise_mm} mm", False, 7),
         (f"Central pole height:  {params.central_pole_height_mm} mm", False, 7),
         (f"Pole diameter:        {params.central_pole_diameter_mm} mm", False, 7),

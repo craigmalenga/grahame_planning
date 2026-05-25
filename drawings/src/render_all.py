@@ -16,7 +16,8 @@ from render_courtyard_section import render as render_section
 from render_staircase_detail import render as render_staircase
 from render_internal_opening import render as render_opening
 from render_kitchen_bathroom import render as render_kitchen
-from render_3d import render_courtyard_3d, render_bathroom_3d, render_internal_opening_3d
+from render_3d import render_bathroom_3d, render_internal_opening_3d
+from render_courtyard_3d_v2 import render_courtyard_3d
 
 
 def render_all():

@@ -238,14 +238,14 @@ def render_cover_sheet():
     for i, ln in enumerate(method_lines):
         ax.text(30, method_y - 5 - i * 4, ln, fontsize=7, ha="left")
 
-    # Status box
-    ax.add_patch(FancyBboxPatch((280, 195), 110, 30,
+    # Status box — top-right of sheet, well clear of the index table + title block
+    ax.add_patch(FancyBboxPatch((290, 240), 100, 35,
                                 boxstyle="round,pad=2",
                                 fc="#fff4e0", ec="#aa6600", lw=0.6))
-    ax.text(335, 218, "STATUS", fontsize=8, weight="bold", ha="center")
-    ax.text(335, 211, "FOR PLANNING — DRAFT", fontsize=10, weight="bold",
+    ax.text(340, 268, "STATUS", fontsize=8, weight="bold", ha="center")
+    ax.text(340, 258, "FOR PLANNING — DRAFT", fontsize=10, weight="bold",
             ha="center", color="#aa6600")
-    ax.text(335, 204, "Rev. A — 2026-05-25", fontsize=7, ha="center")
+    ax.text(340, 248, "Rev. B — 2026-05-25", fontsize=7, ha="center")
 
     out_dir = Path(__file__).resolve().parent.parent / "output"
     pdf, png = save_sheet(fig, "01_cover_index", out_dir)

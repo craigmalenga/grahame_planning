@@ -19,6 +19,12 @@ A3_W_MM = 420.0
 A3_H_MM = 297.0
 MM_PER_INCH = 25.4
 
+# Standard drawing zone — every drawing is placed inside this rectangle.
+# Notes column lives to the right of the drawing zone.
+DRAWING_ZONE = dict(x0=15, y0=85, x1=255, y1=283)   # 240 x 198 mm
+NOTES_ZONE   = dict(x0=262, y0=85, x1=410, y1=283)  # right margin 148 wide
+# Drawing zone is well clear of the title block (bottom-right at y<80).
+
 # Drafting conventions
 DIM_LINE_COLOR = "#222222"
 DIM_TEXT_SIZE = 7
@@ -38,6 +44,39 @@ class Scale:
     def factor(self) -> float:
         # multiply world-mm by this to get sheet-mm
         return 1.0 / self.denominator
+
+
+def auto_origin(world_w_mm: float, world_h_mm: float, scale: Scale,
+                 zone: dict = None) -> tuple:
+    """Compute a sheet-mm origin (bottom-left of drawing) that centres a
+    world-mm bounding box of (world_w × world_h) inside the given drawing
+    zone (or the standard DRAWING_ZONE)."""
+    zone = zone or DRAWING_ZONE
+    zone_w = zone["x1"] - zone["x0"]
+    zone_h = zone["y1"] - zone["y0"]
+    drawn_w = world_w_mm * scale.factor
+    drawn_h = world_h_mm * scale.factor
+    pad_x = max(0, (zone_w - drawn_w) / 2)
+    pad_y = max(0, (zone_h - drawn_h) / 2)
+    return (zone["x0"] + pad_x, zone["y0"] + pad_y)
+
+
+def wrap_text(text: str, max_chars: int) -> str:
+    """Word-wrap a string at word boundaries to a max line length."""
+    if len(text) <= max_chars:
+        return text
+    words = text.split()
+    lines, cur = [], ""
+    for w in words:
+        if not cur:
+            cur = w
+        elif len(cur) + 1 + len(w) <= max_chars:
+            cur += " " + w
+        else:
+            lines.append(cur); cur = w
+    if cur:
+        lines.append(cur)
+    return "\n".join(lines)
 
 
 def new_a3_landscape(title: str, drawing_no: str, scale: Scale,
@@ -98,8 +137,10 @@ def new_a3_landscape(title: str, drawing_no: str, scale: Scale,
     # Left column (wide): project, drawing title, client/rev
     cell(tb_x, col_split, 4, "PROJECT", project,
          value_size=8, value_weight="bold")
-    cell(tb_x, col_split, 3, "DRAWING TITLE", title,
-         value_size=8, value_weight="bold")
+    # Wrap long titles so they fit the cell (col_split ≈ 95 mm wide)
+    wrapped_title = wrap_text(title, max_chars=50)
+    cell(tb_x, col_split, 3, "DRAWING TITLE", wrapped_title,
+         value_size=7 if "\n" in wrapped_title else 8, value_weight="bold")
     cell(tb_x, col_split, 2, "CLIENT", client,
          value_size=8, value_weight="normal")
     cell(tb_x, col_split, 1, "REVISION", rev,

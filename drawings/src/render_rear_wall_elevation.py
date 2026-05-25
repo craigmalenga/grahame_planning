@@ -51,7 +51,7 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
             [w.y(y0 + gf_ffl), w.y(y0 + gf_ffl)],
             color="#888", lw=0.3, linestyle=(0, (4, 2)))
     ax.text(*w.p(x0 - 80, y0 + gf_ffl),
-            "GF FFL\n+2820", fontsize=5, ha="right", va="center", color="#888")
+            "GF FFL\n+3000", fontsize=5, ha="right", va="center", color="#888")
     ax.text(*w.p(x0 - 80, y0),
             "Courtyard\nslab ±0", fontsize=5, ha="right", va="center", color="#888")
 
@@ -315,7 +315,7 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
 
 def render(proposed=False, dwg_no="04-A"):
     dims = load_dims()
-    scale = Scale(50)
+    scale = Scale(25)   # Rev C uplift
     title = ("PROPOSED REAR WALL ELEVATION — south wall of courtyard"
              if proposed else
              "EXISTING REAR WALL ELEVATION — south wall of courtyard")
@@ -325,7 +325,14 @@ def render(proposed=False, dwg_no="04-A"):
         client=dims["project"]["client"],
         rev=dims["project"]["rev"],
     )
-    w = World(ax, scale, origin_sheet_xy=(75, 90))
+    from sheet import auto_origin
+    wall_w = dims["rear_wall"]["total_width_mm"]
+    parapet_est = dims["courtyard"]["slab_to_gf_ffl_mm"] + \
+                  dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["rear_reception"] + 600
+    ox, oy = auto_origin(wall_w + 1600, parapet_est + 800, scale)
+    ox += 1200 * scale.factor
+    oy += 600 * scale.factor
+    w = World(ax, scale, origin_sheet_xy=(ox, oy))
     draw_rear_wall_elevation(ax, w, dims, proposed=proposed)
 
     # Notes

@@ -187,7 +187,7 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
     # Vertical: rise from courtyard slab to landing
     dim_vertical(ax, w, courtyard_slab, landing_top,
                  cx0 - ext_t - 1200,
-                 label=f"{params.total_rise_mm}\nstaircase\ntotal rise\n(14 × 201)")
+                 label=f"{params.total_rise_mm}\nstaircase\ntotal rise\n(15 × 200)")
     # GF FFL to courtyard slab
     dim_vertical(ax, w, courtyard_slab, gf_ffl,
                  cx0 - ext_t - 700,
@@ -209,7 +209,7 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
 
     # Datum labels (text)
     for label, y_val, color in [("courtyard slab  ±0", courtyard_slab, "#000"),
-                                 ("GF FFL  +2820", gf_ffl, "#666"),
+                                 ("GF FFL  +3000", gf_ffl, "#666"),
                                  ("white-line  +2900",
                                   oy + dims["courtyard"]["white_paint_datum_mm"], "#999"),
                                  ("kitchen ceiling  +5270", gf_ceil_kit, "#666"),
@@ -233,7 +233,7 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
 
 def render(proposed=True, dwg_no="05-A"):
     dims = load_dims()
-    scale = Scale(50)
+    scale = Scale(25)   # Rev C uplift
     title = ("PROPOSED COURTYARD SECTION A-A (showing spiral staircase)"
              if proposed else "EXISTING COURTYARD SECTION A-A")
     fig, ax = new_a3_landscape(
@@ -242,7 +242,13 @@ def render(proposed=True, dwg_no="05-A"):
         client=dims["project"]["client"],
         rev=dims["project"]["rev"],
     )
-    w = World(ax, scale, origin_sheet_xy=(95, 110))
+    from sheet import auto_origin
+    cd = dims["courtyard"]["plan_depth_mm"]
+    parapet_est = dims["courtyard"]["slab_to_gf_ffl_mm"] + \
+                  dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["rear_reception"] + 600
+    ox, oy = auto_origin(cd + 6000, parapet_est + 1500, scale)
+    ox += 1200 * scale.factor; oy += 1500 * scale.factor
+    w = World(ax, scale, origin_sheet_xy=(ox, oy))
     draw_section(ax, w, dims, proposed=proposed, ox=0, oy=0)
 
     notes_x, notes_y = 290, 270
@@ -256,7 +262,7 @@ def render(proposed=True, dwg_no="05-A"):
         "4. Datums:",
         "   • Courtyard slab = ±0",
         "   • Basement floor = −2760",
-        "   • Ground floor FFL = +2820",
+        "   • Ground floor FFL = +3000",
         "   • Kitchen ceiling = +5270",
         "   • Reception ceiling = +6100",
         "5. Spiral staircase: 14 treads × 201 mm rise =",

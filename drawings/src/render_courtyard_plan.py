@@ -163,29 +163,22 @@ def draw_courtyard_plan(ax, w, dims, *, show_existing=True, show_proposed=False,
         seg_y0 = y_cursor - seg["length"]
         seg_y1 = y_cursor
         if seg.get("type") == "blocked_window":
-            # Ghosted dashed rectangle at the wall plane
+            # Ghosted dashed rectangle at the wall plane (no inline label;
+            # callout 'A' below)
             ax.add_patch(Rectangle(w.p(cx1 - 20, seg_y0),
                                    w.s(40), w.s(seg["length"]),
                                    fc="#c6a070", ec="#aa0000", lw=0.6,
                                    linestyle=(0, (3, 2))))
-            ax.text(*w.p(cx1 + 100, (seg_y0 + seg_y1) / 2),
-                    f"Existing\nbricked-up\n{seg['length']} mm\n(REINSTATE)",
-                    fontsize=5, ha="left", va="center", color="#aa0000",
-                    style="italic")
+            blocked_centre_y = (seg_y0 + seg_y1) / 2
         elif seg.get("type") == "window":
-            # Show the window opening as a gap in the wall + glass line
+            # Window opening as a gap in the wall + glass line
             ax.add_patch(Rectangle(w.p(cx1, seg_y0),
                                    w.s(ext_wall_t), w.s(seg["length"]),
                                    fc="#f4ede0", ec="#000", lw=0.4))
-            # Glass line down the middle of the opening
             ax.plot([w.x(cx1 + ext_wall_t / 2), w.x(cx1 + ext_wall_t / 2)],
                     [w.y(seg_y0 + 50), w.y(seg_y1 - 50)],
                     color="#3a6e8c", lw=0.8)
-            ax.text(*w.p(cx1 + ext_wall_t + 100,
-                          (seg_y0 + seg_y1) / 2),
-                    f"Existing window\n{seg['length']} mm wide\n(basement, retain)",
-                    fontsize=5, ha="left", va="center", color="#333",
-                    style="italic")
+            window_centre_y = (seg_y0 + seg_y1) / 2
         y_cursor = seg_y0
 
     # ---- Indicate the UPPER kitchen-window-to-doorway (overhead, dashed) ----
@@ -196,10 +189,47 @@ def draw_courtyard_plan(ax, w, dims, *, show_existing=True, show_proposed=False,
                            w.s(ext_wall_t + 10), w.s(kw_recess),
                            fill=False, ec="#0066cc", lw=0.6,
                            linestyle=(0, (4, 2))))
-    ax.text(*w.p(cx1 + ext_wall_t + 100, kw_centre_y),
-            "Kitchen window above\n(GROUND FLOOR) —\nPROPOSED: enlarge to\ndoorway for staircase",
-            fontsize=5, ha="left", va="center", color="#0066cc",
-            style="italic")
+
+    # ---- CALLOUTS: place letter markers next to features and put text in
+    # the notes column with leader lines. Avoids text-on-wall overlaps.
+    callout_defs = [
+        ("A", cx1, blocked_centre_y, "#aa0000",
+         "Existing bricked-up opening (600 mm) — REINSTATE\nas matching basement sash."),
+        ("B", cx1, window_centre_y, "#333",
+         "Existing basement sash (1230 mm) — retain."),
+        ("C", cx1, kw_centre_y, "#0066cc",
+         "Kitchen window above (ground floor) — PROPOSED\nenlarge to glazed timber doorway at top of staircase."),
+    ]
+    # Stack callouts in sheet-mm in the notes column header area (above
+    # the main notes panel). Letters: leader lines from feature to letter.
+    callout_anchor_sheet = []
+    cy_anchor = 75   # sheet y for first callout (top-right area)
+    for letter, fx, fy, color, _ in callout_defs:
+        # Draw letter chip at (cx1 + 60mm world, fy) i.e. just outside the wall
+        chip_x_world = cx1 + ext_wall_t + 80
+        chip_x_sheet = w.x(chip_x_world)
+        chip_y_sheet = w.y(fy)
+        # Leader from feature to chip
+        ax.plot([w.x(fx), chip_x_sheet - 1.5],
+                [w.y(fy), chip_y_sheet],
+                color=color, lw=0.4, alpha=0.8)
+        ax.add_patch(Circle((chip_x_sheet, chip_y_sheet), 2.4,
+                                fc=color, ec="white", lw=0.4, zorder=5))
+        ax.text(chip_x_sheet, chip_y_sheet, letter,
+                color="white", fontsize=6, weight="bold",
+                ha="center", va="center", zorder=6)
+    # Callout legend inside the notes column (sheet-mm)
+    key_x = 268
+    key_y = 165
+    ax.text(key_x, key_y, "Callouts on plan:", fontsize=7, weight="bold")
+    for i, (letter, _, _, color, text) in enumerate(callout_defs):
+        yk = key_y - 5 - i * 9
+        ax.add_patch(Circle((key_x + 3, yk), 2.4,
+                            fc=color, ec="white", lw=0.4))
+        ax.text(key_x + 3, yk, letter, color="white",
+                fontsize=6, weight="bold", ha="center", va="center")
+        ax.text(key_x + 9, yk, text, fontsize=6,
+                ha="left", va="center", color="#222")
 
     # ---- Spiral staircase position ----
     sp = dims["spiral_staircase"]
@@ -230,9 +260,7 @@ def draw_courtyard_plan(ax, w, dims, *, show_existing=True, show_proposed=False,
                 fontsize=6, ha="center", va="top", color="#222",
                 weight="bold")
 
-    # ---- Compass / north arrow inside drawing area ----
-    ax.text(*w.p(cx0 + cw / 2, cy1 + 700), "N ↑",
-            fontsize=10, ha="center", va="center", weight="bold")
+    # ---- (Compass arrow lives in the title-block area; no duplicate inside drawing) ----
 
     # ---- Dimensions ----
     # Courtyard overall width (bottom of plan)
@@ -251,7 +279,7 @@ def draw_courtyard_plan(ax, w, dims, *, show_existing=True, show_proposed=False,
                        label=f"{ln}")
         x_cursor += ln
     # Side wall lower breakdown
-    xd = cx1 + ext_wall_t + 1500
+    xd = cx1 + ext_wall_t + 500   # keep dim chain within drawing zone at 1:25
     y_cursor = cy1
     for seg in seq:
         seg_y0 = y_cursor - seg["length"]
@@ -273,8 +301,9 @@ def draw_courtyard_plan(ax, w, dims, *, show_existing=True, show_proposed=False,
 
 def render(existing=True, proposed=False, out_dir=None, dwg_no="02-A"):
     dims = load_dims()
-    scale = Scale(50)
+    scale = Scale(25)  # Rev C: bigger drawing
     title = "PROPOSED REAR COURTYARD PLAN" if proposed else "EXISTING REAR COURTYARD PLAN"
+    from sheet import auto_origin, DRAWING_ZONE
     fig, ax = new_a3_landscape(
         title=title,
         drawing_no=dwg_no,
@@ -283,18 +312,24 @@ def render(existing=True, proposed=False, out_dir=None, dwg_no="02-A"):
         client=dims["project"]["client"],
         rev=dims["project"]["rev"],
         show_north_arrow=True,
-        north_rotation_deg=-45,    # plan page-up = NE compass; N is 45° anticlockwise
+        north_rotation_deg=-45,
     )
-    # Place courtyard centred in the left ~60% of sheet
-    w = World(ax, scale, origin_sheet_xy=(80, 110))
+    # Auto-centre the courtyard + boundary walls in the drawing zone
+    cw = dims["courtyard"]["plan_width_mm"]
+    cd = dims["courtyard"]["plan_depth_mm"]
+    margin = 800  # world-mm for dims + labels
+    ox, oy = auto_origin(cw + 2 * margin, cd + 2 * margin, scale)
+    ox += margin * scale.factor
+    oy += margin * scale.factor
+    w = World(ax, scale, origin_sheet_xy=(ox, oy))
     draw_courtyard_plan(ax, w, dims,
                         show_existing=existing,
                         show_proposed=proposed,
                         ox_world=0, oy_world=0)
 
     # Notes panel
-    notes_x = 280
-    notes_y = 200
+    notes_x = 268
+    notes_y = 270
     notes = [
         "NOTES — REAR COURTYARD PLAN",
         "1. All dimensions in mm at FFL of courtyard slab",
@@ -318,7 +353,7 @@ def render(existing=True, proposed=False, out_dir=None, dwg_no="02-A"):
     for i, line in enumerate(notes):
         weight = "bold" if i == 0 else "normal"
         size = 7 if i == 0 else 6
-        ax.text(notes_x, notes_y - i * 4, line,
+        ax.text(notes_x, notes_y - i * 4.5, line,
                 fontsize=size, weight=weight, ha="left", va="top")
 
     out_dir = out_dir or Path(__file__).resolve().parent.parent / "output"

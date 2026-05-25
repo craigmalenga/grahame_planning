@@ -69,7 +69,7 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
             [w.y(y0 + gf_ffl), w.y(y0 + gf_ffl)],
             color="#888", lw=0.3, linestyle=(0, (4, 2)))
     ax.text(*w.p(x0 - 80, y0 + gf_ffl),
-            "GF FFL\n+2820", fontsize=5, ha="right", va="center", color="#888")
+            "GF FFL\n+3000", fontsize=5, ha="right", va="center", color="#888")
 
     # Courtyard slab line
     ax.text(*w.p(x0 - 80, y0),
@@ -165,10 +165,16 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
     # between the two lower-basement openings (i.e. into the 490 mm pier),
     # then vertical straight down to the courtyard slab.
     if not proposed:
-        # Anchor positions
-        hopper_x = wall_length - 200      # hopper at south end, near corner
-        upper_window_bottom = upper["sill_height_above_courtyard_slab_mm"]
-        # Slope ends between the lower windows: position of the 490 mm pier
+        # EXISTING side-wall downpipe (per Craig's note + photo 16):
+        #   Hopper at top RIGHT (south end, near inside L corner).
+        #   Pipe runs straight DOWN to ABOVE the upper kitchen window head
+        #   (so it clears the window). Then 40° slope LEFTWARD to land at
+        #   the pier between the lower windows. Then vertical down to slab.
+        hopper_x = wall_length - 200
+        upper_window_head = upper["head_height_above_courtyard_slab_mm"]
+        # Slope top must clear the upper kitchen window head by at least 200 mm
+        slope_top = upper_window_head + 200
+        # Slope end goes into the pier between lower windows
         seq = lower["sequence_from_north_mm"]
         x_cur = 0
         pier_centre_x = None
@@ -178,21 +184,19 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
                 break
             x_cur += seg["length"]
         if pier_centre_x is None:
-            pier_centre_x = 1300  # fallback
-        # Vertical top section (hopper → upper_window_bottom)
-        ax.add_patch(Rectangle(w.p(x0 + hopper_x - 45, y0 + upper_window_bottom),
-                               w.s(90), w.s(parapet - upper_window_bottom),
+            pier_centre_x = 1300
+        # Slope bottom — above the lower windows' head
+        slope_bot = sill_low + h_low + 80
+        # Vertical TOP section (hopper at parapet → slope_top, near south)
+        ax.add_patch(Rectangle(w.p(x0 + hopper_x - 45, y0 + slope_top),
+                               w.s(90), w.s(parapet - slope_top),
                                fc="#111", ec="#000", lw=0.4))
-        # Hopper symbol
+        # Hopper
         ax.add_patch(Rectangle(w.p(x0 + hopper_x - 120, y0 + parapet - 250),
                                w.s(240), w.s(180),
                                fc="#222", ec="#000", lw=0.4))
-        # 40° slope: from (hopper_x, upper_window_bottom) down-left to
-        # (pier_centre_x, sill_low + h_low * 0.7) — approximately
-        slope_top = upper_window_bottom
-        slope_bot = sill_low + h_low * 0.7
+        # 40° slope quad — well above the upper kitchen window
         from matplotlib.patches import Polygon as _Poly
-        # Build slope quad
         pts = [
             (x0 + hopper_x - 45, y0 + slope_top),
             (x0 + hopper_x + 45, y0 + slope_top),
@@ -201,12 +205,18 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
         ]
         ax.add_patch(_Poly([w.p(p[0], p[1]) for p in pts], closed=True,
                             fc="#111", ec="#000", lw=0.4))
-        # Vertical bottom (pier → slab)
+        # Vertical BOTTOM section (pier → slab)
         ax.add_patch(Rectangle(w.p(x0 + pier_centre_x - 45, y0),
                                w.s(90), w.s(slope_bot),
                                fc="#111", ec="#000", lw=0.4))
-        ax.text(*w.p(x0 + hopper_x + 200, y0 + parapet - 300),
-                "Existing C.I. downpipe\n(hopper top right;\n40° swan-neck to\nthe pier between\nlower windows)",
+        ax.text(*w.p(x0 + hopper_x + 250, y0 + parapet - 300),
+                "Existing C.I. downpipe:\n"
+                "hopper TOP RIGHT;\n"
+                "swan-neck offset ABOVE\n"
+                "the upper window;\n"
+                "vertical down through\n"
+                "the pier between the\n"
+                "lower windows.",
                 fontsize=5, ha="left", va="top",
                 color="#333", style="italic")
     else:
@@ -316,9 +326,10 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
 
 def render(proposed=False, dwg_no="03-A"):
     dims = load_dims()
-    scale = Scale(50)
+    scale = Scale(25)   # Rev C uplift
     title = "PROPOSED SIDE WALL ELEVATION" if proposed else "EXISTING SIDE WALL ELEVATION"
     title += " — kitchen-side, east wall of courtyard"
+    from sheet import auto_origin
     fig, ax = new_a3_landscape(
         title=title,
         drawing_no=dwg_no,
@@ -327,7 +338,14 @@ def render(proposed=False, dwg_no="03-A"):
         client=dims["project"]["client"],
         rev=dims["project"]["rev"],
     )
-    w = World(ax, scale, origin_sheet_xy=(70, 90))
+    # Auto-centre: side wall 3000 wide + 2 m left/right margin for dims/labels
+    wl = dims["side_wall"]["total_length_mm"]
+    parapet_est = dims["courtyard"]["slab_to_gf_ffl_mm"] + \
+                  dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["rear_reception"] + 600
+    ox, oy = auto_origin(wl + 1600, parapet_est + 800, scale)
+    ox += 1200 * scale.factor
+    oy += 600 * scale.factor
+    w = World(ax, scale, origin_sheet_xy=(ox, oy))
     draw_side_wall_elevation(ax, w, dims, proposed=proposed,
                               ox_world=0, oy_world=0)
 
@@ -343,7 +361,7 @@ def render(proposed=False, dwg_no="03-A"):
         "   • 1230 mm existing basement sash (RIGHT)",
         "4. UPPER (ground floor) — kitchen window,",
         "   structural recess ~900 mm, glass gap 660.",
-        "5. Datums: courtyard slab = 0; GF FFL +2820;",
+        "5. Datums: courtyard slab = 0; GF FFL +3000;",
         "   white-painted brick to +2900 (white-line).",
         "6. Existing cast-iron downpipe currently crosses",
         "   line of proposed new doorway — RATIONALISE.",
