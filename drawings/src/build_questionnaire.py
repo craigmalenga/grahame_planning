@@ -218,6 +218,20 @@ li.q textarea { min-height:70px; resize:vertical; }
         '</div>'
     )
 
+    free_text_section = (
+        '<section class="sheet" id="sheet_FREE">'
+        '<h2>Any other notes, bullet points, or things you want Craig to know</h2>'
+        '<p style="font-size:0.9em;color:#666;">'
+        'Use this box for anything not covered above. Bullet points, plain '
+        'sentences, sketched dimensions — whatever helps. Use <code>-</code> or '
+        '<code>•</code> at the start of a line to start a bullet, or just write '
+        'normally. Everything you type here will be included verbatim at the end '
+        'of the PDF you generate.'
+        '</p>'
+        '<textarea id="free_notes" rows="14" placeholder="- e.g. the bricked-up opening is actually 580 mm not 600&#10;- the kitchen window sits 1800 mm from the south corner&#10;- can we add a small planter under the new doorway threshold?&#10;- I do not like the proposed shower-room arrangement, try…"></textarea>'
+        '</section>'
+    )
+
     actions = (
         '<div class="actions">'
         '<button class="btn" onclick="generatePDF()">📄 Generate PDF answer sheet</button>'
@@ -306,6 +320,21 @@ function generatePDF() {
     hr();
   });
 
+  // Free-text section
+  var freeEl = document.getElementById('free_notes');
+  var freeText = freeEl ? freeEl.value.trim() : '';
+  if (freeText) {
+    y += 2;
+    addText('ADDITIONAL NOTES FROM GRAHAME', { size: 12, bold: true });
+    // Preserve newlines + bullet markers
+    freeText.split('\n').forEach(function(line) {
+      var ln = line.replace(/^\s*[-•*]\s*/, '• ');
+      if (!line.trim()) { y += 2; return; }
+      addText(ln, { size: 10 });
+    });
+    hr();
+  }
+
   var filename = 'Hornton_Answers_' + name.replace(/\s+/g, '_') + '.pdf';
   try {
     var blob = doc.output('blob');
@@ -337,6 +366,7 @@ function generatePDF() {
     html = (
         head + header_html + intro + who
         + "".join(sections_html)
+        + free_text_section
         + actions + js_block
         + '</body></html>'
     )

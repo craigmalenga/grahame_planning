@@ -42,7 +42,11 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
     gf_ffl = dims["courtyard"]["slab_to_gf_ffl_mm"]   # 2820
     white_line = dims["courtyard"]["white_paint_datum_mm"]  # 2900
     gf_ceiling = gf_ffl + dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["kitchen"]
-    parapet = gf_ceiling + 200   # estimate of parapet height above ceiling
+    # Rev C+: clip wall height to just above upper window head + a margin,
+    # so the drawing fits the A3 frame at 1:40 without overflow.
+    # We previously extended to GF ceiling + 200 (5650 mm); now clip to a
+    # useful 5400 mm (covers all openings + the white-line zone + arch).
+    parapet = 5400   # estimate of parapet height above ceiling
     wall_height = parapet
 
     x0, y0 = ox_world, oy_world
@@ -171,9 +175,11 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
         #   (so it clears the window). Then 40° slope LEFTWARD to land at
         #   the pier between the lower windows. Then vertical down to slab.
         hopper_x = wall_length - 200
-        upper_window_head = upper["head_height_above_courtyard_slab_mm"]
-        # Slope top must clear the upper kitchen window head by at least 200 mm
-        slope_top = upper_window_head + 200
+        upper_window_sill = upper["sill_height_above_courtyard_slab_mm"]
+        # Per Craig: pipe must come straight down to the BOTTOM of the upper
+        # kitchen window (= sill level), THEN slope at ~30° from horizontal,
+        # going left, until it can drop vertically through the pier.
+        slope_top = upper_window_sill - 80    # just below sill so the slope clears the window
         # Slope end goes into the pier between lower windows
         seq = lower["sequence_from_north_mm"]
         x_cur = 0
@@ -340,7 +346,7 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
 
 def render(proposed=False, dwg_no="03-A"):
     dims = load_dims()
-    scale = Scale(30)   # Rev C uplift
+    scale = Scale(40)   # Rev C uplift
     title = "PROPOSED SIDE WALL ELEVATION" if proposed else "EXISTING SIDE WALL ELEVATION"
     title += " — kitchen-side, east wall of courtyard"
     from sheet import auto_origin
@@ -355,7 +361,7 @@ def render(proposed=False, dwg_no="03-A"):
     # Auto-centre: side wall 3000 wide + 2 m left/right margin for dims/labels
     wl = dims["side_wall"]["total_length_mm"]
     parapet_est = dims["courtyard"]["slab_to_gf_ffl_mm"] + \
-                  dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["rear_reception"] + 600
+                  dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["kitchen"] + 600
     ox, oy = auto_origin(wl + 1600, parapet_est + 800, scale)
     ox += 1200 * scale.factor
     oy += 600 * scale.factor

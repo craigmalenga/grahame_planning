@@ -30,7 +30,9 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
     white_line = dims["courtyard"]["white_paint_datum_mm"]
     rec_h = dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["rear_reception"]
     gf_ceiling = gf_ffl + rec_h
-    parapet = gf_ceiling + 200
+    # Rev C+: clip wall height — show up to ~400 above upper sash head
+    # = 3800 sill + 2200 sash height + 400 = 6400 mm. At 1:40 = 160 mm.
+    parapet = 6400
     wall_h = parapet
 
     x0, y0 = ox_world, oy_world
@@ -138,10 +140,10 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
 
     # Painted cheek labels
     ax.text(*w.p(x0 + cheek_l / 2, y0 + 400),
-            "white-painted\nbrick cheek\n720 mm",
+            "white-painted\nbrick cheek\n700 mm",
             fontsize=5, ha="center", va="center", style="italic", color="#444")
     ax.text(*w.p(x0 + cheek_l + recess_w + cheek_r / 2, y0 + 400),
-            "white-painted\nbrick cheek\n720 mm",
+            "white-painted\nbrick cheek\n700 mm",
             fontsize=5, ha="center", va="center", style="italic", color="#444")
 
     # Assembly labels
@@ -325,7 +327,7 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
 
 def render(proposed=False, dwg_no="04-A"):
     dims = load_dims()
-    scale = Scale(30)   # Rev C uplift
+    scale = Scale(40)   # Rev C uplift
     title = ("PROPOSED REAR WALL ELEVATION — south wall of courtyard"
              if proposed else
              "EXISTING REAR WALL ELEVATION — south wall of courtyard")
@@ -353,9 +355,9 @@ def render(proposed=False, dwg_no="04-A"):
         "   the rear wall of the dwelling.",
         "2. The wall is 3250 mm wide (E-W).",
         "3. LOWER (basement) — recessed double-door bay:",
-        "   • 720 mm painted-brick cheek (LEFT)",
+        "   • 700 mm painted-brick cheek (LEFT)",
         "   • 1850 mm recess containing 2 timber leaves",
-        "   • 720 mm painted-brick cheek (RIGHT)",
+        "   • 700 mm painted-brick cheek (RIGHT)",
         "   • Recess head at 2900 mm (white-line).",
         "4. UPPER (ground floor) — large multi-pane sash:",
         "   • 2100 mm wide × 2400 mm tall (existing).",

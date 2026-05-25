@@ -33,7 +33,8 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
     kitchen_h = dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["kitchen"]
     gf_ceil_rec = gf_ffl + rec_h            # reception ceiling
     gf_ceil_kit = gf_ffl + kitchen_h         # kitchen ceiling
-    parapet = gf_ceil_rec + 200
+    # Rev C+: clip section parapet to fit A3
+    parapet = gf_ceil_rec + 100
     bas_floor = gf_ffl - dims["flat_envelope"]["basement"]["ceiling_heights_mm"]["rear_room"]
     # ^ basement floor = GF FFL minus basement ceiling height (basement under reception)
 
@@ -233,7 +234,7 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
 
 def render(proposed=True, dwg_no="05-A"):
     dims = load_dims()
-    scale = Scale(30)   # Rev C uplift
+    scale = Scale(40)   # Rev C uplift
     title = ("PROPOSED COURTYARD SECTION A-A (showing spiral staircase)"
              if proposed else "EXISTING COURTYARD SECTION A-A")
     fig, ax = new_a3_landscape(

@@ -100,9 +100,9 @@ rear_wall:
     # it is a SINGLE CENTRAL DOOR with a SASH WINDOW each side, all under
     # one red-brick flat arch.  The two flanking side-windows have RAISED
     # BRICK SILLS (so they don't extend all the way to the threshold).
-    left_painted_cheek_mm: 720       # 72 cm white-painted brick stub OUTSIDE the recess
+    left_painted_cheek_mm: 700       # 70 cm — adjusted so 700+1850+700=3250 exactly matches courtyard width
     recess_width_mm: 1850            # 185 cm — recess width (door + 2 side windows + reveals)
-    right_painted_cheek_mm: 720
+    right_painted_cheek_mm: 700      # see left cheek note
     _check_arithmetic: "720+1850+720 = 3290 mm (~329 cm) vs. courtyard width 3250 mm. ~4 cm tolerance / wall-thickness rounding."
     # Composition WITHIN the 1850 mm recess (from left to right):
     side_window_width_mm: 465        # each flanking sash — fits (25+465+25+820+25+465+25 = 1850 ✓)
@@ -138,11 +138,15 @@ rear_wall:
     sill_height_above_ffl_mm: 800    # 80 cm sill above interior floor (Grahame)
     sill_height_above_courtyard_slab_mm: 3800  # 380 cm (Grahame, from courtyard)
     head_height_above_courtyard_slab_mm: 6200  # = sill + height
-    horizontal_position_from_east_corner_mm: 400
+    # Per Craig (Rev C+ photo review 2026-05-25): the upper rear-reception
+    # sash IS centred in the rear wall (not the 400 mm offset that Grahame's
+    # internal-room measurement implied). Centred = (3250-2100)/2 = 575 mm
+    # from each end.
+    horizontal_position_from_east_corner_mm: 575
     _status_horizontal_position: |
-      CORRECTED Rev B: Grahame's email gives 40 cm offset from side wall (east)
-      to start of the 210 cm window, then 70 cm to end of wall.  So the
-      window starts 400 mm from the east corner.  Was previously 575.
+      Rev C+: centred on the 3250 mm rear wall per Craig's photo confirmation.
+      Grahame's internal-room "40 cm offset" was measured from the side wall
+      INSIDE the rear-reception, which is a different reference.
 
 # -----------------------------------------------------------------------------
 # SIDE WALL (east wall of courtyard, ~300 cm long)
@@ -171,7 +175,7 @@ side_wall:
     structural_recess_width_mm: 900    # wider than glass; _status: TBC final figure
     _status_recess: "Grahame said recess wider than 66 cm but didn't measure. Working estimate 900 mm."
     sill_height_above_kitchen_ffl_mm: 720          # 72 cm sill (Grahame)
-    sill_height_above_courtyard_slab_mm: 3540      # 2820 (FFL) + 720 (sill)
+    sill_height_above_courtyard_slab_mm: 3720      # 3000 (FFL Rev C) + 720 (sill)
     _status_sill_grahame: |
       Grahame quoted "372 cm" sill height above courtyard slab. Computed 354 cm.
       18 cm discrepancy — likely slab thickness / boundary masonry / rounding.
