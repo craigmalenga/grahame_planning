@@ -20,12 +20,17 @@
 
 project:
   title: "Flat 1, 20 Hornton Street, London W8 4NR"
-  client: "G. Pearce"
+  client: "Grahame McGirr"
   borough: "Royal Borough of Kensington and Chelsea"
   conservation_area: "Kensington Conservation Area (to confirm)"
   listed_building: true   # Grade II terrace — to confirm via RBKC list
-  rev: "A"
+  rev: "B"
   status: "FOR PLANNING — DRAFT"
+  orientation_note: |
+    The dwelling's REAR wall (the one with the door bay) faces NE — per
+    Craig's confirmation 2026-05-25.  Plans therefore show N rotated ~45°
+    relative to the drawing's up direction.  Elevations do not show N
+    arrows (the elevation is a vertical projection; up = sky).
 
 # -----------------------------------------------------------------------------
 # OVERALL FLAT ENVELOPE (from job16873-1)
@@ -68,7 +73,13 @@ flat_envelope:
 courtyard:
   plan_width_mm: 3250         # east-west, between boundary and kitchen wall (= 325 cm Grahame)
   plan_depth_mm: 2950         # north-south, between rear-reception wall and rear boundary (= 295 cm Grahame)
-  slab_to_gf_ffl_mm: 2820     # courtyard slab to ground-floor finished floor level (= 2.82 m surveyor)
+  # CORRECTED in Rev B per dimension-audit agent:
+  #   Grahame's own sill measurements give 3720 mm (kitchen) and 3800 mm
+  #   (rear) above the courtyard slab.  With internal sills at 720/800 mm
+  #   above FFL the implied slab-to-FFL is ~3000 mm — NOT 2820 mm (which
+  #   was the basement ceiling height, a different dimension).
+  slab_to_gf_ffl_mm: 3000     # courtyard slab to ground-floor FFL (re-derived)
+  _status_slab_to_ffl: "Re-derived from Grahame's measured sill heights; confirm on site."
   white_paint_datum_mm: 2900  # height of white-paint line on courtyard brickwork (Grahame)
   rear_boundary_wall_height_mm: 3500
   _status_boundary_height: "TBC: 3.5 m quoted in one email; confirm on site."
@@ -94,9 +105,9 @@ rear_wall:
     right_painted_cheek_mm: 720
     _check_arithmetic: "720+1850+720 = 3290 mm (~329 cm) vs. courtyard width 3250 mm. ~4 cm tolerance / wall-thickness rounding."
     # Composition WITHIN the 1850 mm recess (from left to right):
-    side_window_width_mm: 450        # each flanking sash (working estimate from photo)
+    side_window_width_mm: 465        # each flanking sash — fits (25+465+25+820+25+465+25 = 1850 ✓)
     side_window_raised_sill_height_mm: 600   # brick-sill panel below each side window
-    central_door_width_mm: 900       # central single door (working estimate)
+    central_door_width_mm: 820       # central single door — per Grahame's "82 cm doorway" email
     inner_reveal_mm: 25              # frame reveal at each end + between
     head_height_above_slab_mm: 2300  # head of door & side-window assembly above courtyard slab
     head_to_white_line_mm: 2900      # 290 cm height of recess at white line (Grahame)
@@ -117,7 +128,7 @@ rear_wall:
       painted-brick cheek width OUTSIDE the recess (72 cm each side).
   upper_ground:
     sash_width_mm: 2100              # 210 cm wide — rear-reception window (Grahame)
-    sash_height_mm: 2400             # head must be below 3280 ceiling; using 2400 (NOT 3000)
+    sash_height_mm: 2200             # CORRECTED Rev B (was 2400); head must allow cornice + lintel under 3280 ceiling
     _status_sash_height: |
       Grahame's email said "300-310 cm high"; that would put the head above the
       3280 ceiling, which is impossible.  Plausible interpretation is that
@@ -127,8 +138,11 @@ rear_wall:
     sill_height_above_ffl_mm: 800    # 80 cm sill above interior floor (Grahame)
     sill_height_above_courtyard_slab_mm: 3800  # 380 cm (Grahame, from courtyard)
     head_height_above_courtyard_slab_mm: 6200  # = sill + height
-    horizontal_position_from_east_corner_mm: 575
-    _status_horizontal_position: "TBC: window position along the 325 cm wall — using 575 mm offset (centring approx 2100 wide window in 3250 wall)."
+    horizontal_position_from_east_corner_mm: 400
+    _status_horizontal_position: |
+      CORRECTED Rev B: Grahame's email gives 40 cm offset from side wall (east)
+      to start of the 210 cm window, then 70 cm to end of wall.  So the
+      window starts 400 mm from the east corner.  Was previously 575.
 
 # -----------------------------------------------------------------------------
 # SIDE WALL (east wall of courtyard, ~300 cm long)
@@ -185,15 +199,10 @@ existing_services:
     _status_position: "TBC: estimated from photo 16. Confirm by site survey."
     swan_neck_height_above_slab_mm: 3500
     note: "Currently crosses the line of the kitchen-window/door conversion — must be rerouted in the proposal."
-  downpipe_rear_wall_right:
-    # Cast-iron downpipe on the REAR wall (south wall of courtyard) — RIGHT side.
-    # Visible in photo 14 (RIGHT side of the door bay).
-    diameter_mm: 90
-    material: "cast iron, black-painted"
-    position_from_east_corner_mm: 2900    # near the east end (right side of door bay)
-    _status_position: "TBC: estimated from photo 14 — runs to the right of the central door."
-    swan_neck_height_above_slab_mm: 3200
-    note: "Existing downpipe on rear wall (right of door) — retain in proposal."
+  # NOTE: in Rev A.1 we had a "downpipe_rear_wall_right" entry — REMOVED in
+  # Rev B per dimension-audit agent: only the LEFT/inside-corner downpipe
+  # is actually visible in any photograph or PDF.  A "right" downpipe was
+  # assumed in error.
   downpipe_rear_wall_left:
     # Cast-iron downpipe on the REAR wall — LEFT inside-corner.
     # Visible in photo 14 (LEFT edge of the rear-wall view — in the L corner).
@@ -257,18 +266,34 @@ proposed:
 # SPIRAL STAIRCASE (reclaimed Victorian cast iron) — physical artefact
 # -----------------------------------------------------------------------------
 spiral_staircase:
-  n_treads: 14                       # 14 treads + top landing = 15 pads as counted by Grahame
-  _note_treads: "Grahame counted 15 pads; the top one acts as the landing-pad meeting the new doorway threshold. So 14 risers carry the rise."
-  tread_rise_mm: 201                 # 14 × 201 = 2814 mm ≈ 2820 mm kitchen FFL
-  total_rise_mm: 2814
+  # Corrected Rev B: slab-to-FFL is 3000 mm (not 2820), so risers must take
+  # 3000 mm rise.  Grahame counted 15 pads — interpret as 15 risers ×
+  # 200 mm = 3000 mm exactly (or 14 risers × 214 mm).  Adopting 15 × 200.
+  n_treads: 15                       # 15 risers carrying the 3000 mm rise
+  _note_treads: |
+    Grahame counted 15 pads.  In Rev B with slab-to-FFL = 3000 mm, the
+    cleanest fit is 15 risers × 200 mm = 3000 mm exactly.  Top tread
+    becomes the landing pad meeting the kitchen-doorway threshold.
+  tread_rise_mm: 200                 # 15 × 200 = 3000 mm = slab-to-FFL
+  total_rise_mm: 3000
   central_pole_height_mm: 3300       # extends above landing as handrail post
   central_pole_diameter_mm: 90
   outer_radius_mm: 800               # 80 cm projection (Grahame)
   envelope_radius_mm: 875            # ~175 cm overall diameter
   tread_widest_mm: 340
   tread_thickness_mm: 30
-  rotation_per_tread_deg: 25.7       # 360 / 14 = 25.7 — full revolution over the rise
-  start_angle_deg: 270               # first tread faces south-into-the-courtyard
+  # Setting-out (Rev B fix): user must EXIT facing the kitchen doorway,
+  # which is on the EAST side wall (in plan: +x direction from staircase
+  # centre).  With 15 risers we tune the rotation so the top tread
+  # presents its outer edge eastward.  Choosing 24°/tread → 15×24°=360°
+  # full revolution: enter and exit at the same compass angle.  We set
+  # entry tread on south side (azimuth 270° in math convention) so the
+  # user steps in from the courtyard slab facing the kitchen; the
+  # spiral winds clockwise (descending angle) and the top tread
+  # presents east-facing.
+  rotation_per_tread_deg: 24         # 15 × 24 = 360° full revolution
+  start_angle_deg: 270               # first tread faces south (into courtyard)
+  spiral_direction: "clockwise (viewed from above; descending angle)"
   finish: "dark painted cast iron, black ironwork"
   handrail_height_mm: 900
   # Position in the courtyard plan: centred 950 mm from each of side & rear walls
@@ -281,16 +306,19 @@ spiral_staircase:
 # Ground floor; ceiling 3.28 m.
 # -----------------------------------------------------------------------------
 front_lounge:
-  approx_room_width_mm: 4340         # = ground floor flat width
+  # CORRECTED Rev B: 4340 is the FLAT envelope (front-back), NOT room width.
+  # Front lounge ROOM width per Grahame ~2650 mm (the "265 cm total" wall).
+  # Hallway eats into this side.
+  room_width_mm: 2650               # internal room width (NS in plan)
   fireplace_wall_breakdown_mm: [1900, 1800, 1900]   # 190 / 180 / 190 around fireplace
   # Grahame's far-left wall: "70 cm + 112 cm cut-out + 265 cm TOTAL"
-  # i.e. 700 mm solid + 1120 mm cut-out + 830 mm solid = 2650 mm total length.
-  far_left_wall_breakdown_mm: [700, 1120, 830]      # segments along the wall
+  far_left_wall_breakdown_mm: [700, 1120, 830]      # 700 + 1120 + 830 = 2650
   far_left_wall_total_mm: 2650
   ceiling_mm: 3280
 
 rear_reception:
-  approx_room_width_mm: 4340
+  # Rear reception is ~35 cm wider than front (Grahame): 2650 + 350 = 3000 mm.
+  room_width_mm: 3000
   side_wall_breakdown_mm: [650, 1120, 1500]         # 60-70 / 112 / 150
   dividing_wall_thickness_mm: 100                   # 10 cm internal wall
   fireplace_wall_breakdown_mm: [1450, 1840, 1460]   # 145 / 184(fireplace) / 146
@@ -301,21 +329,25 @@ rear_reception:
   ceiling_mm: 3280
 
 internal_opening_between_rooms:
+  # Wall between front lounge and rear reception; the OPENING width must
+  # fit within the front-lounge width 2650 mm (the narrower room).
   location: "Wall between front lounge and rear reception"
   wall_thickness_mm: 100
   existing:
-    _status: "TBC: as-found opening width/height not measured. Treating as approximately 1120 mm wide × ~2100 mm high based on far-left-wall 112 cm cut-out."
-    approx_width_mm: 1120
+    approx_width_mm: 1120        # the 112 cm cut-out Grahame measured
     approx_height_mm: 2100
+    _status: "TBC: as-found opening dims; tape-measure required."
   proposed:
     nib_left_mm: 700                                # 70 cm retained nib (Grahame)
     nib_right_mm: 600                               # 60 cm retained nib (Grahame)
-    height_mm: 2950                                 # 290-300 cm (Grahame)
+    height_mm: 2950                                 # 290-300 cm head (Grahame)
+    # Corrected Rev B: clear = front_lounge.room_width - nib_left - nib_right
+    # = 2650 - 700 - 600 = 1350 mm
+    clear_width_mm: 1350
     _clear_width_calculation: |
-      The full wall length minus nibs (700 + 600 = 1300) gives the clear
-      opening. If the wall is 4340 - external_walls (~700) = ~3640, then
-      clear = ~2340 mm. _status: TBC site re-measure.
-    clear_width_mm: 2400
+      front_lounge.room_width_mm (2650) − nib_left (700) − nib_right (600)
+      = 1350 mm clear opening.  Centred on the lounge ⇒ slightly offset
+      relative to the rear reception (which is 350 mm wider).
     structural_note: "Subject to structural engineer design — steel beam with end pad-stones; final size & padstone widths by engineer."
     making_good: "Make good plaster, skirting, cornicing and ceiling to match existing period detail to both rooms."
 
@@ -337,12 +369,19 @@ kitchen:
 
 proposed_shower_room:
   available_length_mm: 2500
+  # Rev B: in Rev A the zones summed to 2700 + 100 partition = 2800 mm,
+  # 300 mm over the 2500 mm available run.  Re-tuned below to fit:
+  #   shower 900 + part 100 + WC 500 + part 100 + basin 400 + part 100 + laundry 400
+  #   = 2500 mm exactly.  Note basin is now compact wall-hung.
   partition_thickness_mm: 100
   zones:
-    shower_tray_width_mm: 1000
-    wc_zone_mm: 600
-    basin_zone_mm: 500
-    laundry_zone_width_mm: 600
+    shower_tray_width_mm: 900     # 900 (slightly narrower tray than 1000)
+    wc_zone_mm: 500               # 500 (compact WC, concealed cistern)
+    basin_zone_mm: 400            # 400 (wall-hung compact basin)
+    laundry_zone_width_mm: 400    # 400 (single front-loader; no stacking)
+    _zone_arithmetic: |
+      900 + 100 + 500 + 100 + 400 + 100 + 400 = 2500 mm exactly within
+      the 2500 mm available wall run.  Three 100 mm partition walls.
   door_type: "Pocket / sliding door"
   pocket_door_clear_opening_mm: 700
   glazed_doors_available:

@@ -41,8 +41,10 @@ class Scale:
 
 
 def new_a3_landscape(title: str, drawing_no: str, scale: Scale,
-                     project: str = "Flat 1, 20 Hornton Street, London",
-                     client: str = "G. Pearce", rev: str = "A"):
+                     project: str = "Flat 1, 20 Hornton Street, London W8 4NR",
+                     client: str = "Grahame McGirr", rev: str = "B",
+                     show_north_arrow: bool = False,
+                     north_rotation_deg: float = 0.0):
     """Create an A3 landscape figure with title block and border.
 
     Returns (fig, ax_drawing) where ax_drawing's data coords are in SHEET MM
@@ -121,11 +123,20 @@ def new_a3_landscape(title: str, drawing_no: str, scale: Scale,
          value_size=8, value_weight="bold")
 
     # North arrow / orientation marker (top right inside drawing area)
-    nx, ny = A3_W_MM - 30, A3_H_MM - 30
-    ax.annotate("N", xy=(nx, ny + 6), xytext=(nx, ny - 6),
-                arrowprops=dict(arrowstyle="-|>", color="black", lw=1.2),
-                ha="center", va="center", fontsize=10, weight="bold")
-    ax.add_patch(plt.Circle((nx, ny), 8, fill=False, ec="black", lw=0.5))
+    # Rev B: only shown on plan/site drawings (set show_north_arrow=True).
+    if show_north_arrow:
+        import numpy as _np
+        nx, ny = A3_W_MM - 30, A3_H_MM - 30
+        ax.add_patch(plt.Circle((nx, ny), 9, fill=False, ec="black", lw=0.5))
+        # arrow rotated by north_rotation_deg (0 = up; +ve = clockwise)
+        a = _np.deg2rad(north_rotation_deg)
+        dx = _np.sin(a)
+        dy = _np.cos(a)
+        ax.annotate("N",
+                    xy=(nx + 6 * dx, ny + 6 * dy),
+                    xytext=(nx - 6 * dx, ny - 6 * dy),
+                    arrowprops=dict(arrowstyle="-|>", color="black", lw=1.2),
+                    ha="center", va="center", fontsize=10, weight="bold")
 
     # Scale bar bottom-left
     sb_x, sb_y = 20, 15

@@ -26,9 +26,11 @@ def render_site_plan():
     fig, ax = new_a3_landscape(
         title="SITE & STREET-CONTEXT PLAN — No. 20 Hornton Street",
         drawing_no="09",
-        scale=Scale(500),   # used for label only; we'll draw schematically
+        scale=Scale(500),
         project=dims["project"]["title"],
         client=dims["project"]["client"], rev=dims["project"]["rev"],
+        show_north_arrow=True,
+        north_rotation_deg=-45,    # Hornton St runs ~NE-SW; building rear faces NE
     )
 
     # We'll draw a schematic strip of terrace properties along Hornton Street.

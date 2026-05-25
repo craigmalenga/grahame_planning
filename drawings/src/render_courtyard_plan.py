@@ -144,17 +144,15 @@ def draw_courtyard_plan(ax, w, dims, *, show_existing=True, show_proposed=False,
             "Central door + 2 flanking sash windows\n(all under one flat arch)",
             fontsize=5, ha="center", va="top", style="italic", color="#444")
 
-    # Rear-wall downpipes (left corner + right of door)
-    rear_dp_r = dims["existing_services"]["downpipe_rear_wall_right"]
-    rear_dp_l = dims["existing_services"]["downpipe_rear_wall_left"]
+    # Rear-wall downpipe — LEFT inside-corner only (right downpipe removed in Rev B)
     from matplotlib.patches import Circle as _Circle
-    for dp, lab in [(rear_dp_r, "DP-R"), (rear_dp_l, "DP-L\n(L corner)")]:
-        dx = cx0 + dp["position_from_east_corner_mm"]
-        ax.add_patch(_Circle(w.p(dx, cy0 - ext_wall_t / 2),
-                             w.s(dp["diameter_mm"] / 2),
-                             fc="#000", ec="#000"))
-        ax.text(*w.p(dx, cy0 - ext_wall_t - 200),
-                lab, fontsize=4, ha="center", va="top", color="#333")
+    rear_dp_l = dims["existing_services"]["downpipe_rear_wall_left"]
+    dx = cx0 + rear_dp_l["position_from_east_corner_mm"]
+    ax.add_patch(_Circle(w.p(dx, cy0 - ext_wall_t / 2),
+                         w.s(rear_dp_l["diameter_mm"] / 2),
+                         fc="#000", ec="#000"))
+    ax.text(*w.p(dx, cy0 - ext_wall_t - 200),
+            "DP\n(L corner)", fontsize=4, ha="center", va="top", color="#333")
 
     # ---- SIDE WALL openings shown in plan ----
     # Lower-basement: 51 + 60(bricked) + 49 + 123(glass) + 17 = 300 cm sequence
@@ -284,6 +282,8 @@ def render(existing=True, proposed=False, out_dir=None, dwg_no="02-A"):
         project=dims["project"]["title"],
         client=dims["project"]["client"],
         rev=dims["project"]["rev"],
+        show_north_arrow=True,
+        north_rotation_deg=-45,    # plan page-up = NE compass; N is 45° anticlockwise
     )
     # Place courtyard centred in the left ~60% of sheet
     w = World(ax, scale, origin_sheet_xy=(80, 110))

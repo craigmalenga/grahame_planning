@@ -216,6 +216,8 @@ def render(proposed=True, dwg_no="08-A"):
         project=dims["project"]["title"],
         client=dims["project"]["client"],
         rev=dims["project"]["rev"],
+        show_north_arrow=True,
+        north_rotation_deg=-45,
     )
     w = World(ax, scale, origin_sheet_xy=(90, 110))
     draw_kitchen_plan(ax, w, dims, proposed=proposed)

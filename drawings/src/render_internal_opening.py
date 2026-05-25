@@ -23,7 +23,7 @@ def load_dims():
 def draw_internal_elevation(ax, w, dims, proposed=True, ox=0, oy=0):
     """Internal elevation looking at the dividing wall from the front lounge."""
     # The wall extends across the flat width
-    wall_w = dims["front_lounge"]["approx_room_width_mm"]  # 4340
+    wall_w = dims["front_lounge"]["room_width_mm"]  # 2650 (Rev B — was 4340 envelope)
     ceil = dims["front_lounge"]["ceiling_mm"]              # 3280
     skirt_h = 200
     cornice_h = 200
@@ -130,7 +130,8 @@ def draw_internal_plan(ax, w, dims, proposed=True, ox=0, oy=0):
     """Plan view (top-down) of the two reception rooms either side of the
     dividing wall, with the proposed enlarged opening."""
     # Use rough dimensions
-    flat_w = dims["flat_envelope"]["ground_floor"]["width_mm"]  # 4340
+    # Rev B: use room widths (not flat envelope) so opening fits inside lounge
+    flat_w = dims["front_lounge"]["room_width_mm"]  # 2650
     # Rooms are along the depth of the flat — let's show ~5m of each
     room_depth = 5000
     wall_t_ext = 350

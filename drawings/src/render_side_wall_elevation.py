@@ -155,23 +155,123 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
                                fill=False, ec="#666", lw=0.5,
                                linestyle=(0, (3, 2))))
 
-    # ---- Downpipe (left wall, runs vertically) ----
-    pipe_x = dims["existing_services"]["downpipe_side_wall"]["position_from_north_corner_mm"]
+    # ---- Downpipe (side wall) ----
+    # In this elevation: x = 0 is NORTH end (left of drawing), x = wall_length
+    # is SOUTH end (right of drawing = inside L corner).
+    #
+    # EXISTING (per Craig's note): starts on the RIGHT (south, near the
+    # inside L corner) — comes vertical down from the hopper to roughly the
+    # bottom of the upper kitchen window, then slopes ~40° LEFTWARD to
+    # between the two lower-basement openings (i.e. into the 490 mm pier),
+    # then vertical straight down to the courtyard slab.
     if not proposed:
-        downpipe(ax, w, x0 + pipe_x, y0, y0 + parapet,
-                 diameter=90, swan_neck_at=None)
-        ax.text(*w.p(x0 + pipe_x + 200, y0 + parapet - 600),
-                "Existing\ncast-iron\ndownpipe",
+        # Anchor positions
+        hopper_x = wall_length - 200      # hopper at south end, near corner
+        upper_window_bottom = upper["sill_height_above_courtyard_slab_mm"]
+        # Slope ends between the lower windows: position of the 490 mm pier
+        seq = lower["sequence_from_north_mm"]
+        x_cur = 0
+        pier_centre_x = None
+        for seg in seq:
+            if seg.get("label", "").startswith("solid brick pier"):
+                pier_centre_x = x_cur + seg["length"] / 2
+                break
+            x_cur += seg["length"]
+        if pier_centre_x is None:
+            pier_centre_x = 1300  # fallback
+        # Vertical top section (hopper → upper_window_bottom)
+        ax.add_patch(Rectangle(w.p(x0 + hopper_x - 45, y0 + upper_window_bottom),
+                               w.s(90), w.s(parapet - upper_window_bottom),
+                               fc="#111", ec="#000", lw=0.4))
+        # Hopper symbol
+        ax.add_patch(Rectangle(w.p(x0 + hopper_x - 120, y0 + parapet - 250),
+                               w.s(240), w.s(180),
+                               fc="#222", ec="#000", lw=0.4))
+        # 40° slope: from (hopper_x, upper_window_bottom) down-left to
+        # (pier_centre_x, sill_low + h_low * 0.7) — approximately
+        slope_top = upper_window_bottom
+        slope_bot = sill_low + h_low * 0.7
+        from matplotlib.patches import Polygon as _Poly
+        # Build slope quad
+        pts = [
+            (x0 + hopper_x - 45, y0 + slope_top),
+            (x0 + hopper_x + 45, y0 + slope_top),
+            (x0 + pier_centre_x + 45, y0 + slope_bot),
+            (x0 + pier_centre_x - 45, y0 + slope_bot),
+        ]
+        ax.add_patch(_Poly([w.p(p[0], p[1]) for p in pts], closed=True,
+                            fc="#111", ec="#000", lw=0.4))
+        # Vertical bottom (pier → slab)
+        ax.add_patch(Rectangle(w.p(x0 + pier_centre_x - 45, y0),
+                               w.s(90), w.s(slope_bot),
+                               fc="#111", ec="#000", lw=0.4))
+        ax.text(*w.p(x0 + hopper_x + 200, y0 + parapet - 300),
+                "Existing C.I. downpipe\n(hopper top right;\n40° swan-neck to\nthe pier between\nlower windows)",
                 fontsize=5, ha="left", va="top",
                 color="#333", style="italic")
     else:
-        # Rerouted downpipe (new position further south, away from doorway)
-        new_pipe_x = dims["proposed"]["downpipe"]["new_position_from_north_corner_mm"]
+        # PROPOSED: straight-down route, tight to the SOUTH end (inside corner)
+        # to clear the new doorway and the staircase landing.
+        new_pipe_x = wall_length - 150    # right inside the L corner
         downpipe(ax, w, x0 + new_pipe_x, y0, y0 + parapet, diameter=90)
-        ax.text(*w.p(x0 + new_pipe_x + 200, y0 + parapet - 600),
-                "Downpipe\nRATIONALISED:\nrerouted clear\nof new doorway\n& staircase",
-                fontsize=5, ha="left", va="top",
+        ax.text(*w.p(x0 + new_pipe_x - 200, y0 + 1500),
+                "Downpipe RATIONALISED:\nrerouted straight down in\nthe L corner — clear of new\ndoorway & staircase tread\nenvelope.",
+                fontsize=5, ha="right", va="center",
                 color="#aa0000", style="italic", weight="bold")
+
+    # ---- PROPOSED: superimpose the spiral staircase on the right ----
+    if proposed:
+        # In this view, the inside L corner is at the SOUTH (right) end of
+        # the wall.  Staircase centre sits 950 mm in from the rear wall,
+        # so 950 mm in from the south (right) end of the side wall.
+        sp = dims["spiral_staircase"]
+        stair_cx_on_wall = wall_length - dims["proposed"]["staircase_installation"]["centre_distance_from_rear_wall_mm"]
+        env_r = sp["envelope_radius_mm"]
+        pole_r = sp["central_pole_diameter_mm"] / 2
+        total_rise = sp["n_treads"] * sp["tread_rise_mm"]
+        handrail_top = total_rise + sp["handrail_height_mm"]
+        # Semi-transparent silhouette
+        ax.add_patch(Rectangle(w.p(x0 + stair_cx_on_wall - env_r, y0),
+                               w.s(2 * env_r), w.s(handrail_top),
+                               fc="#222222", ec="#111", lw=0.4, alpha=0.18))
+        # Central pole
+        ax.add_patch(Rectangle(w.p(x0 + stair_cx_on_wall - pole_r, y0),
+                               w.s(2 * pole_r),
+                               w.s(sp["central_pole_height_mm"]),
+                               fc="#111", ec="#000", lw=0.5))
+        # Tread silhouettes
+        import math
+        for i in range(sp["n_treads"]):
+            rise_y = y0 + (i + 1) * sp["tread_rise_mm"]
+            angle = math.radians(sp["start_angle_deg"]
+                                  + i * sp["rotation_per_tread_deg"])
+            proj = math.cos(angle) * sp["outer_radius_mm"]
+            slab_x0_ = x0 + stair_cx_on_wall - 30
+            slab_x1_ = x0 + stair_cx_on_wall + proj
+            ax.add_patch(Rectangle(
+                w.p(min(slab_x0_, slab_x1_) - x0,
+                    rise_y - y0 - sp["tread_thickness_mm"]),
+                w.s(abs(slab_x1_ - slab_x0_)),
+                w.s(sp["tread_thickness_mm"]),
+                fc="#333", ec="#000", lw=0.3, alpha=0.85))
+        # Handrail curve
+        rxs, rys = [], []
+        n = 60
+        for s in range(n + 1):
+            t = s / n
+            ry = y0 + t * total_rise + sp["handrail_height_mm"]
+            a = math.radians(sp["start_angle_deg"]
+                              + t * sp["n_treads"] * sp["rotation_per_tread_deg"])
+            rx = x0 + stair_cx_on_wall + math.cos(a) * sp["outer_radius_mm"]
+            rxs.append(w.x(rx)); rys.append(w.y(ry))
+        ax.plot(rxs, rys, color="#111", lw=0.7, alpha=0.85)
+        # Annotation
+        ax.text(*w.p(x0 + stair_cx_on_wall, y0 + parapet + 200),
+                "PROPOSED spiral staircase shown superimposed\n(semi-transparent — silhouette as seen square-on)",
+                fontsize=6, ha="center", va="center",
+                color="#aa0000", style="italic", weight="bold",
+                bbox=dict(boxstyle="round,pad=0.3", fc="white",
+                          ec="#aa0000", lw=0.5))
 
     # ---- Ground line below courtyard slab ----
     ground_line(ax, w, x0 - 200, x0 + wall_length + 200, y0,
@@ -204,13 +304,14 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
                  label=f"{parapet} (overall)")
 
     # ---- Compass direction marker ----
-    ax.text(*w.p(x0 - 50, y0 + parapet + 400),
-            "← N", fontsize=8, ha="right", va="center", color="#555")
-    ax.text(*w.p(x0 + wall_length + 50, y0 + parapet + 400),
-            "S →", fontsize=8, ha="left", va="center", color="#555")
-    ax.text(*w.p(x0 + wall_length / 2, y0 + parapet + 400),
-            "Viewed FROM the courtyard, looking EAST at the kitchen-side wall",
-            fontsize=6, ha="center", va="center", style="italic")
+    # Rev B: building is rotated so this is "near-east".  Kept simple.
+    ax.text(*w.p(x0 - 50, y0 + parapet + 500),
+            "← N (near-north)", fontsize=7, ha="right", va="center", color="#666")
+    ax.text(*w.p(x0 + wall_length + 50, y0 + parapet + 500),
+            "(L-corner)  S →", fontsize=7, ha="left", va="center", color="#666")
+    ax.text(*w.p(x0 + wall_length / 2, y0 + parapet + 500),
+            "Viewed FROM the courtyard, looking E at the kitchen-side wall",
+            fontsize=7, ha="center", va="center", style="italic")
 
 
 def render(proposed=False, dwg_no="03-A"):

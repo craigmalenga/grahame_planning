@@ -132,7 +132,14 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
             "Lower-basement\ndouble doors\n(visible in section)",
             fontsize=5, ha="left", va="center", style="italic", color="#444")
 
-    # ---- SPIRAL STAIRCASE in elevation ----
+    # ---- SPIRAL STAIRCASE in elevation (PROPOSED only) ----
+    if not proposed:
+        # Existing section: courtyard is empty (no staircase yet)
+        ax.text(*w.p((cx0 + cx1) / 2, courtyard_slab + 1500),
+                "Existing courtyard\n(no staircase)",
+                fontsize=7, ha="center", va="center",
+                style="italic", color="#666")
+        return
     sp = dims["spiral_staircase"]
     # In section the staircase is cut roughly through its centre
     # Place staircase centre on the section plane at:

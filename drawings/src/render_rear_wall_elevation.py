@@ -173,19 +173,18 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
                 label_above=False)
     flat_arch(ax, w, sash_x0, y0 + sill_up + sash_h, sash_w)
 
-    # ---- Existing downpipes on rear wall (right of door + left corner) ----
-    # Right-side downpipe (visible in photo 14, right of door)
-    dp_right_x = x0 + dims["existing_services"]["downpipe_rear_wall_right"]["position_from_east_corner_mm"]
-    downpipe(ax, w, dp_right_x, y0, y0 + parapet, diameter=90)
-    ax.text(*w.p(dp_right_x + 150, y0 + 1500),
-            "Existing\nC.I.\ndownpipe\n(R)", fontsize=4.5,
-            ha="left", va="center", color="#333", style="italic")
-    # Left-corner downpipe (visible in photo 14, in the L corner)
+    # ---- Existing downpipe on rear wall — LEFT inside-corner only ----
+    # (Rev B: removed the "right" downpipe — it was not visible in any photo.)
+    # The L-corner downpipe is conventionally shown on the SIDE-wall
+    # elevation (since it sits AT the corner), so we represent it only as a
+    # small dashed indicator on the rear wall.
     dp_left_x = x0 + dims["existing_services"]["downpipe_rear_wall_left"]["position_from_east_corner_mm"]
-    downpipe(ax, w, dp_left_x, y0, y0 + parapet, diameter=90)
-    ax.text(*w.p(dp_left_x - 150, y0 + 1500),
-            "Existing\nC.I.\ndownpipe\n(L corner)", fontsize=4.5,
-            ha="right", va="center", color="#333", style="italic")
+    ax.plot([w.x(dp_left_x), w.x(dp_left_x)], [w.y(y0), w.y(y0 + parapet)],
+            color="#000", lw=0.4, linestyle=(0, (3, 2)), alpha=0.5)
+    ax.text(*w.p(dp_left_x + 50, y0 + 800),
+            "Existing C.I. downpipe at L corner\n(see SIDE-wall elevation, dwg 03)",
+            fontsize=4.5, ha="left", va="center", color="#666", style="italic")
+    dp_right_x = None  # not used downstream
 
     # ---- PROPOSED: superimpose the spiral staircase as it appears when
     # viewing the rear wall square-on (i.e. you see through the courtyard,
@@ -200,7 +199,12 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
         #  conventionally shows the wall as seen FROM the courtyard, i.e.
         #  west on the LEFT and east on the RIGHT.  So x increases eastward
         #  and the inside corner of the L is at the RIGHT end of the wall.)
-        stair_cx_on_wall = wall_w - dims["proposed"]["staircase_installation"]["centre_distance_from_side_wall_mm"]
+        # Inside corner of L is at the EAST end of the rear wall.
+        # In this elevation, viewer faces SOUTH so EAST is on viewer's LEFT,
+        # which in drawing coords is x = 0 (the LEFT end of the wall).
+        # Staircase centre is 950 mm in from the side wall = 950 mm from
+        # the EAST end of the rear wall, so at x = 950 (LEFT side of drawing).
+        stair_cx_on_wall = dims["proposed"]["staircase_installation"]["centre_distance_from_side_wall_mm"]
         # The staircase is 950 mm in front of the rear wall (depth into courtyard).
         # We draw it as a SEMI-TRANSPARENT silhouette overlay on the rear-wall
         # elevation: a circle (envelope) + the central pole rising the full
