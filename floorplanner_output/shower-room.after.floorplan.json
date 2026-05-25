@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "name": "20 Hornton St — Shower-room AFTER (proposed)",
+  "createdAt": "2026-05-25T00:00:00.000Z",
+  "updatedAt": "2026-05-25T00:00:00.000Z",
+  "floorPlan": {
+    "name": "Flat 1, 20 Hornton Street — Kitchen with new compact shower-room",
+    "originalImageUrl": "",
+    "width": 1200,
+    "height": 1200,
+    "scale": 100,
+    "wallSegments": [],
+    "rooms": [
+      {
+        "id": "kitchen-residual",
+        "name": "Kitchen (residual after shower-room build)",
+        "walls": [
+          { "x1": 0,    "y1": 0,    "x2": 2.90, "y2": 0,    "thickness": 0.22 },
+          { "x1": 2.90, "y1": 0,    "x2": 2.90, "y2": 0.90, "thickness": 0.22 },
+          { "x1": 2.90, "y1": 0.90, "x2": 0,    "y2": 0.90, "thickness": 0.10,
+            "subSegments": [
+              { "id": "kp-1", "startFraction": 0.00, "endFraction": 0.62, "isGap": false },
+              { "id": "kp-2", "startFraction": 0.62, "endFraction": 0.86, "isGap": true  },
+              { "id": "kp-3", "startFraction": 0.86, "endFraction": 1.00, "isGap": false }
+            ] },
+          { "x1": 0,    "y1": 0.90, "x2": 0,    "y2": 0,    "thickness": 0.22 }
+        ],
+        "bounds": { "minX": 0, "minY": 0, "maxX": 2.90, "maxY": 0.90 },
+        "center": { "x": 1.45, "y": 0.45 },
+        "ceilingHeight": 2.45,
+        "wallTexture": "plaster-white",
+        "floorTexture": "tile-grey",
+        "ceilingTexture": "plaster-white",
+        "showFloor": true,
+        "showCeiling": true,
+        "doors": [
+          { "id": "door-kitchen-entry", "wallIndex": 3, "position": 0.30,
+            "width": 0.80, "height": 2.10,
+            "type": "single", "openDirection": "inward", "style": "wood-white" }
+        ],
+        "windows": [],
+        "furniture": [
+          { "id": "stove", "type": "stove", "x": 0.40, "y": 0.20, "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 },
+          { "id": "counter-1", "type": "countertop", "x": 1.50, "y": 0.20, "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 },
+          { "id": "sink", "type": "kitchen-sink", "x": 2.55, "y": 0.20, "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 }
+        ]
+      },
+      {
+        "id": "shower-room",
+        "name": "Shower Room (proposed)",
+        "walls": [
+          { "x1": 0,    "y1": 0.90, "x2": 2.90, "y2": 0.90, "thickness": 0.10,
+            "subSegments": [
+              { "id": "sp-1", "startFraction": 0.00, "endFraction": 0.62, "isGap": false },
+              { "id": "sp-2", "startFraction": 0.62, "endFraction": 0.86, "isGap": true  },
+              { "id": "sp-3", "startFraction": 0.86, "endFraction": 1.00, "isGap": false }
+            ] },
+          { "x1": 2.90, "y1": 0.90, "x2": 2.90, "y2": 2.40, "thickness": 0.22 },
+          { "x1": 2.90, "y1": 2.40, "x2": 0,    "y2": 2.40, "thickness": 0.22 },
+          { "x1": 0,    "y1": 2.40, "x2": 0,    "y2": 0.90, "thickness": 0.22 }
+        ],
+        "bounds": { "minX": 0, "minY": 0.90, "maxX": 2.90, "maxY": 2.40 },
+        "center": { "x": 1.45, "y": 1.65 },
+        "ceilingHeight": 2.45,
+        "wallTexture": "tile-grey",
+        "floorTexture": "tile-grey",
+        "ceilingTexture": "plaster-white",
+        "showFloor": true,
+        "showCeiling": true,
+        "doors": [],
+        "windows": [
+          { "id": "win-kitchen-existing-small", "wallIndex": 1, "position": 0.40,
+            "width": 0.90, "height": 1.30, "sillHeight": 0.72, "type": "single" }
+        ],
+        "furniture": [
+          { "id": "shower-90", "type": "shower",
+            "x": 0.45, "y": 1.40,
+            "rotation": 0, "scaleX": 1.0, "scaleY": 1.0,
+            "color": "#1a1a1a" },
+          { "id": "wc",         "type": "toilet",
+            "x": 1.15, "y": 2.10,
+            "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 },
+          { "id": "basin",      "type": "bathroom-sink",
+            "x": 1.70, "y": 2.20,
+            "rotation": 0, "scaleX": 0.80, "scaleY": 0.80 },
+          { "id": "washer",     "type": "dishwasher",
+            "x": 2.40, "y": 2.15,
+            "rotation": 0, "scaleX": 1.0, "scaleY": 1.0,
+            "color": "#dddddd" },
+          { "id": "mirror",     "type": "mirror-led",
+            "x": 1.70, "y": 2.35,
+            "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 }
+        ]
+      }
+    ]
+  },
+  "sceneConfig": {
+    "ambientLightIntensity": 0.55,
+    "ambientLightColor": "#ffffff",
+    "directionalLightIntensity": 0.9,
+    "directionalLightColor": "#fff2d8",
+    "directionalLightPosition": [5, 10, 5],
+    "pointLights": [],
+    "backgroundColor": "#f5f2e8",
+    "fogEnabled": false,
+    "fogColor": "#e0e0e0", "fogNear": 10, "fogFar": 50
+  },
+  "customTextures": []
+}

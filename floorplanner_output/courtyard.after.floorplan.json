@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "name": "20 Hornton St — Courtyard AFTER (proposed)",
+  "createdAt": "2026-05-25T00:00:00.000Z",
+  "updatedAt": "2026-05-25T00:00:00.000Z",
+  "floorPlan": {
+    "name": "Flat 1, 20 Hornton Street — Proposed rear courtyard with spiral",
+    "originalImageUrl": "",
+    "width": 1200,
+    "height": 1200,
+    "scale": 100,
+    "wallSegments": [],
+    "rooms": [
+      {
+        "id": "courtyard-rect-B",
+        "name": "Courtyard (rear leg)",
+        "walls": [
+          { "x1": 0,    "y1": 0,    "x2": 3.25, "y2": 0,    "thickness": 0.22 },
+          { "x1": 3.25, "y1": 0,    "x2": 3.25, "y2": 1.75, "thickness": 0.22 },
+          { "x1": 3.25, "y1": 1.75, "x2": 0,    "y2": 1.75, "thickness": 0.22,
+            "subSegments": [
+              { "id": "gB-bot-solid-l", "startFraction": 0.0,   "endFraction": 0.446, "isGap": false },
+              { "id": "gB-bot-gap",     "startFraction": 0.446, "endFraction": 1.0,   "isGap": true }
+            ] },
+          { "x1": 0,    "y1": 1.75, "x2": 0,    "y2": 0,    "thickness": 0.22 }
+        ],
+        "bounds": { "minX": 0, "minY": 0, "maxX": 3.25, "maxY": 1.75 },
+        "center": { "x": 1.625, "y": 0.875 },
+        "ceilingHeight": 6.56,
+        "showCeiling": false,
+        "showFloor": true,
+        "wallTexture": "brick-red",
+        "floorTexture": "concrete",
+        "ceilingTexture": "plaster-white",
+        "doors": [
+          { "id": "door-rear-bay-central", "wallIndex": 0, "position": 0.50,
+            "width": 0.82, "height": 2.10,
+            "type": "single", "openDirection": "outward", "style": "wood-white" }
+        ],
+        "windows": [
+          { "id": "win-rear-bay-side-L", "wallIndex": 0, "position": 0.34,
+            "width": 0.465, "height": 1.40, "sillHeight": 0.60, "type": "single" },
+          { "id": "win-rear-bay-side-R", "wallIndex": 0, "position": 0.66,
+            "width": 0.465, "height": 1.40, "sillHeight": 0.60, "type": "single" },
+          { "id": "win-rear-reception-sash-upper", "wallIndex": 0, "position": 0.50,
+            "width": 2.10, "height": 2.20, "sillHeight": 3.58, "type": "double" }
+        ],
+        "furniture": [
+          { "id": "spiral-victorian", "type": "staircase-spiral",
+            "x": 2.55, "y": 1.20,
+            "rotation": -2.225,
+            "scaleX": 0.85, "scaleY": 0.85,
+            "color": "#0a0a0a" },
+          { "id": "downpipe-l-corner", "type": "plant-pot",
+            "x": 3.05, "y": 1.55,
+            "rotation": 0, "scaleX": 0.30, "scaleY": 0.30,
+            "color": "#0a0a0a" },
+          { "id": "lantern-rear-1", "type": "wall-uplight",
+            "x": 0.60, "y": 0.05,
+            "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 },
+          { "id": "lantern-rear-2", "type": "wall-uplight",
+            "x": 2.65, "y": 0.05,
+            "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 }
+        ]
+      },
+      {
+        "id": "courtyard-rect-A",
+        "name": "Courtyard (kitchen leg)",
+        "walls": [
+          { "x1": 1.45, "y1": 1.75, "x2": 3.25, "y2": 1.75, "thickness": 0.22,
+            "subSegments": [
+              { "id": "gA-top-gap", "startFraction": 0.0, "endFraction": 1.0, "isGap": true }
+            ] },
+          { "x1": 3.25, "y1": 1.75, "x2": 3.25, "y2": 2.95, "thickness": 0.22 },
+          { "x1": 3.25, "y1": 2.95, "x2": 1.45, "y2": 2.95, "thickness": 0.22 },
+          { "x1": 1.45, "y1": 2.95, "x2": 1.45, "y2": 1.75, "thickness": 0.22 }
+        ],
+        "bounds": { "minX": 1.45, "minY": 1.75, "maxX": 3.25, "maxY": 2.95 },
+        "center": { "x": 2.35, "y": 2.35 },
+        "ceilingHeight": 6.56,
+        "showCeiling": false,
+        "showFloor": true,
+        "wallTexture": "brick-red",
+        "floorTexture": "concrete",
+        "ceilingTexture": "plaster-white",
+        "doors": [],
+        "windows": [
+          { "id": "win-side-basement-glass", "wallIndex": 3, "position": 0.65,
+            "width": 1.23, "height": 1.60, "sillHeight": 0.90, "type": "double" },
+          { "id": "win-side-basement-reinstated", "wallIndex": 3, "position": 0.30,
+            "width": 0.60, "height": 1.60, "sillHeight": 0.90, "type": "single" },
+          { "id": "win-upstairs-doorway-onto-spiral", "wallIndex": 3, "position": 0.50,
+            "width": 0.95, "height": 2.10, "sillHeight": 3.00, "type": "single" }
+        ],
+        "furniture": []
+      }
+    ]
+  },
+  "sceneConfig": {
+    "ambientLightIntensity": 0.45,
+    "ambientLightColor": "#ffffff",
+    "directionalLightIntensity": 1.15,
+    "directionalLightColor": "#fff2d8",
+    "directionalLightPosition": [8, 14, 6],
+    "pointLights": [
+      { "position": [0.60, 2.40, 0.30], "intensity": 0.6, "color": "#ffd9a0", "distance": 6 },
+      { "position": [2.65, 2.40, 0.30], "intensity": 0.6, "color": "#ffd9a0", "distance": 6 }
+    ],
+    "backgroundColor": "#9ecbe8",
+    "fogEnabled": false,
+    "fogColor": "#e0e0e0", "fogNear": 10, "fogFar": 50
+  },
+  "customTextures": []
+}

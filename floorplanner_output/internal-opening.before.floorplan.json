@@ -1,0 +1,77 @@
+{
+  "version": "1.0",
+  "name": "20 Hornton St — Internal Opening BEFORE",
+  "createdAt": "2026-05-25T00:00:00.000Z",
+  "updatedAt": "2026-05-25T00:00:00.000Z",
+  "floorPlan": {
+    "name": "Flat 1, 20 Hornton Street — Reception rooms (existing)",
+    "originalImageUrl": "",
+    "width": 1200,
+    "height": 1200,
+    "scale": 100,
+    "wallSegments": [],
+    "rooms": [
+      {
+        "id": "front-lounge",
+        "name": "Front Lounge",
+        "walls": [
+          { "x1": -5.00, "y1": -8.00, "x2": -2.35, "y2": -8.00, "thickness": 0.30 },
+          { "x1": -2.35, "y1": -8.00, "x2": -2.35, "y2": -3.35, "thickness": 0.10 },
+          { "x1": -2.35, "y1": -3.35, "x2": -5.00, "y2": -3.35, "thickness": 0.30 },
+          { "x1": -5.00, "y1": -3.35, "x2": -5.00, "y2": -8.00, "thickness": 0.30 }
+        ],
+        "bounds": { "minX": -5.00, "minY": -8.00, "maxX": -2.35, "maxY": -3.35 },
+        "center": { "x": -3.675, "y": -5.675 },
+        "ceilingHeight": 3.28,
+        "wallTexture": "plaster-white",
+        "floorTexture": "hardwood-oak",
+        "ceilingTexture": "plaster-white",
+        "showFloor": true,
+        "showCeiling": true,
+        "doors": [
+          { "id": "door-existing-narrow", "wallIndex": 1, "position": 0.50,
+            "width": 1.12, "height": 2.10,
+            "type": "single", "openDirection": "inward", "style": "wood-white" }
+        ],
+        "windows": [],
+        "furniture": []
+      },
+      {
+        "id": "rear-reception",
+        "name": "Rear Reception (existing — narrower)",
+        "walls": [
+          { "x1": -2.35, "y1": -8.00, "x2":  0.00, "y2": -8.00, "thickness": 0.30 },
+          { "x1":  0.00, "y1": -8.00, "x2":  0.00, "y2": -3.35, "thickness": 0.30 },
+          { "x1":  0.00, "y1": -3.35, "x2": -2.35, "y2": -3.35, "thickness": 0.30 },
+          { "x1": -2.35, "y1": -3.35, "x2": -2.35, "y2": -8.00, "thickness": 0.10 }
+        ],
+        "bounds": { "minX": -2.35, "minY": -8.00, "maxX": 0.00, "maxY": -3.35 },
+        "center": { "x": -1.175, "y": -5.675 },
+        "ceilingHeight": 3.28,
+        "wallTexture": "plaster-white",
+        "floorTexture": "hardwood-oak",
+        "ceilingTexture": "plaster-white",
+        "showFloor": true,
+        "showCeiling": true,
+        "doors": [],
+        "windows": [
+          { "id": "win-rear-recep-courtyard", "wallIndex": 1, "position": 0.50,
+            "width": 2.10, "height": 2.20, "sillHeight": 0.30, "type": "double" }
+        ],
+        "furniture": []
+      }
+    ]
+  },
+  "sceneConfig": {
+    "ambientLightIntensity": 0.50,
+    "ambientLightColor": "#ffffff",
+    "directionalLightIntensity": 1.0,
+    "directionalLightColor": "#fff2d8",
+    "directionalLightPosition": [5, 10, 5],
+    "pointLights": [],
+    "backgroundColor": "#f0eee5",
+    "fogEnabled": false,
+    "fogColor": "#e0e0e0", "fogNear": 10, "fogFar": 50
+  },
+  "customTextures": []
+}

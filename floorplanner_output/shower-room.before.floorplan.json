@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "name": "20 Hornton St — Kitchen / Shower-room zone BEFORE",
+  "createdAt": "2026-05-25T00:00:00.000Z",
+  "updatedAt": "2026-05-25T00:00:00.000Z",
+  "floorPlan": {
+    "name": "Flat 1, 20 Hornton Street — Existing kitchen (no shower room)",
+    "originalImageUrl": "",
+    "width": 1200,
+    "height": 1200,
+    "scale": 100,
+    "wallSegments": [],
+    "rooms": [
+      {
+        "id": "kitchen-existing",
+        "name": "Kitchen (existing — full footprint, no shower)",
+        "walls": [
+          { "x1": 0,    "y1": 0,    "x2": 2.90, "y2": 0,    "thickness": 0.22 },
+          { "x1": 2.90, "y1": 0,    "x2": 2.90, "y2": 2.40, "thickness": 0.22 },
+          { "x1": 2.90, "y1": 2.40, "x2": 0,    "y2": 2.40, "thickness": 0.22 },
+          { "x1": 0,    "y1": 2.40, "x2": 0,    "y2": 0,    "thickness": 0.22 }
+        ],
+        "bounds": { "minX": 0, "minY": 0, "maxX": 2.90, "maxY": 2.40 },
+        "center": { "x": 1.45, "y": 1.20 },
+        "ceilingHeight": 2.45,
+        "wallTexture": "plaster-white",
+        "floorTexture": "tile-grey",
+        "ceilingTexture": "plaster-white",
+        "showFloor": true,
+        "showCeiling": true,
+        "doors": [
+          { "id": "door-kitchen-entry", "wallIndex": 3, "position": 0.30,
+            "width": 0.80, "height": 2.10,
+            "type": "single", "openDirection": "inward", "style": "wood-white" }
+        ],
+        "windows": [
+          { "id": "win-kitchen-existing-small", "wallIndex": 1, "position": 0.50,
+            "width": 0.90, "height": 1.30, "sillHeight": 0.72, "type": "single" }
+        ],
+        "furniture": [
+          { "id": "fridge",    "type": "fridge",     "x": 0.30, "y": 2.10, "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 },
+          { "id": "stove",     "type": "stove",      "x": 0.90, "y": 2.10, "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 },
+          { "id": "counter-1", "type": "countertop", "x": 1.65, "y": 2.10, "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 },
+          { "id": "sink",      "type": "kitchen-sink","x": 2.45, "y": 2.10, "rotation": 0, "scaleX": 1.0, "scaleY": 1.0 }
+        ]
+      }
+    ]
+  },
+  "sceneConfig": {
+    "ambientLightIntensity": 0.55,
+    "ambientLightColor": "#ffffff",
+    "directionalLightIntensity": 0.9,
+    "directionalLightColor": "#fff2d8",
+    "directionalLightPosition": [5, 10, 5],
+    "pointLights": [],
+    "backgroundColor": "#f5f2e8",
+    "fogEnabled": false,
+    "fogColor": "#e0e0e0", "fogNear": 10, "fogFar": 50
+  },
+  "customTextures": []
+}
