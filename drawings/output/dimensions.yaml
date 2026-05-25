@@ -207,6 +207,15 @@ existing_services:
   # Rev B per dimension-audit agent: only the LEFT/inside-corner downpipe
   # is actually visible in any photograph or PDF.  A "right" downpipe was
   # assumed in error.
+  downpipe_rear_wall_right:
+    # Cast-iron downpipe on the REAR wall (right of door bay) — Craig
+    # confirmed Rev D (2026-05-25) that this exists per the photoreal
+    # render he provided.  Runs full height of the wall.
+    diameter_mm: 90
+    material: "cast iron, black-painted"
+    position_from_east_corner_mm: 3050
+    _status_position: "TBC: estimate ~200 mm in from the west end of the rear wall."
+    note: "Existing downpipe — retain in proposal."
   downpipe_rear_wall_left:
     # Cast-iron downpipe on the REAR wall — LEFT inside-corner.
     # Visible in photo 14 (LEFT edge of the rear-wall view — in the L corner).
@@ -260,8 +269,11 @@ proposed:
   # SPIRAL STAIRCASE installed in inside corner of L
   staircase_installation:
     position: "Inside corner of the L (where side wall meets rear wall) within the courtyard"
-    centre_distance_from_side_wall_mm: 950
-    centre_distance_from_rear_wall_mm: 950
+    # Rev D+: pull the staircase HARD into the L corner. Outer tread envelope
+    # = 875 mm radius; with centre at 900 mm from each wall, we have just
+    # 25 mm clearance between the outermost tread and the wall surface.
+    centre_distance_from_side_wall_mm: 900
+    centre_distance_from_rear_wall_mm: 900
     top_landing_level_above_courtyard_slab_mm: 2820   # = kitchen FFL
     base_fixing: "Steel base-plate bolted to courtyard slab; final detail by engineer."
     top_fixing: "Side-fixed to side wall + propped from staircase centre pole; final detail by engineer."

@@ -154,24 +154,24 @@ def render_courtyard_3d():
             sw_w, ext_t, sw_sill,
             color="#f7f2e6", alpha=wall_alpha_low)
     # Glass for left sash
-    add_box(polys, colors, alphas, lsw_x, -ext_t - 5, sw_sill,
+    add_box(polys, colors, alphas, lsw_x, -5, sw_sill,
             sw_w, 10, door_head - sw_sill,
             color="#b8d4e0", alpha=0.85)
     # White stone sill projection
-    add_box(polys, colors, alphas, lsw_x - 30, -ext_t - 40, sw_sill - 30,
+    add_box(polys, colors, alphas, lsw_x - 30, 0, sw_sill - 30,
             sw_w + 60, 40, 30,
             color="#e8e4dc", alpha=1.0)
     # Central door
     door_x = lsw_x + sw_w + rev
     # Door panel (dark timber bottom + glazing top)
-    add_box(polys, colors, alphas, door_x, -ext_t - 20, 0,
+    add_box(polys, colors, alphas, door_x, -20, 0,
             door_w, 20, door_head * 0.55,
             color="#3d2a1a", alpha=1.0)
-    add_box(polys, colors, alphas, door_x, -ext_t - 20, door_head * 0.55,
+    add_box(polys, colors, alphas, door_x, -20, door_head * 0.55,
             door_w, 20, door_head * 0.45,
             color="#b8d4e0", alpha=0.85)
     # Door threshold (slate)
-    add_box(polys, colors, alphas, door_x - 30, -ext_t - 60, 0,
+    add_box(polys, colors, alphas, door_x - 30, 0, 0,
             door_w + 60, 60, 40,
             color="#4a4a4a", alpha=1.0)
     # Right side sash mirror
@@ -179,10 +179,10 @@ def render_courtyard_3d():
     add_box(polys, colors, alphas, rsw_x, -ext_t, 0,
             sw_w, ext_t, sw_sill,
             color="#f7f2e6", alpha=wall_alpha_low)
-    add_box(polys, colors, alphas, rsw_x, -ext_t - 5, sw_sill,
+    add_box(polys, colors, alphas, rsw_x, -5, sw_sill,
             sw_w, 10, door_head - sw_sill,
             color="#b8d4e0", alpha=0.85)
-    add_box(polys, colors, alphas, rsw_x - 30, -ext_t - 40, sw_sill - 30,
+    add_box(polys, colors, alphas, rsw_x - 30, 0, sw_sill - 30,
             sw_w + 60, 40, 30,
             color="#e8e4dc", alpha=1.0)
     # Wall above door/window head but below white-line (red-brick arch zone)
@@ -200,21 +200,21 @@ def render_courtyard_3d():
     sash_h = up["sash_height_mm"]
     ssill = up["sill_height_above_courtyard_slab_mm"]
     sash_x = up["horizontal_position_from_east_corner_mm"]
-    add_box(polys, colors, alphas, sash_x, -ext_t - 5, ssill,
+    add_box(polys, colors, alphas, sash_x, -5, ssill,
             sash_w, 10, sash_h,
             color="#b8d4e0", alpha=0.9)
     # Red-brick flat arch over upper sash
-    add_box(polys, colors, alphas, sash_x - 30, -ext_t - 6,
+    add_box(polys, colors, alphas, sash_x - 30, -6,
             ssill + sash_h,
             sash_w + 60, 12, 120,
             color="#b85a3a", alpha=1.0)
     # Upper sash stone sill
-    add_box(polys, colors, alphas, sash_x - 30, -ext_t - 40,
+    add_box(polys, colors, alphas, sash_x - 30, 0,
             ssill - 30,
             sash_w + 60, 40, 30,
             color="#e8e4dc", alpha=1.0)
     # Red-brick flat arch over the door/window assembly (lower)
-    add_box(polys, colors, alphas, asm_x0 - 30, -ext_t - 6,
+    add_box(polys, colors, alphas, asm_x0 - 30, -6,
             white_line - 80,
             asm_w + 60, 12, 80,
             color="#b85a3a", alpha=1.0)
@@ -235,7 +235,7 @@ def render_courtyard_3d():
                     ext_t, seg["length"], sill_low,
                     color="#f7f2e6", alpha=wall_alpha_low)
             # Glass
-            add_box(polys, colors, alphas, cw + ext_t - 5, seg_y0, sill_low,
+            add_box(polys, colors, alphas, cw - 5, seg_y0, sill_low,
                     10, seg["length"], h_low,
                     color="#b8d4e0", alpha=0.85)
             # Brick above head up to white-line
@@ -243,7 +243,7 @@ def render_courtyard_3d():
                     ext_t, seg["length"], white_line - sill_low - h_low,
                     color="#f7f2e6", alpha=wall_alpha_low)
             # Red flat arch
-            add_box(polys, colors, alphas, cw + ext_t - 8, seg_y0 - 30,
+            add_box(polys, colors, alphas, cw - 8, seg_y0 - 30,
                     sill_low + h_low,
                     16, seg["length"] + 60, 100,
                     color="#b85a3a", alpha=1.0)
@@ -268,23 +268,31 @@ def render_courtyard_3d():
     door_thresh = slab_to_ffl
     door_head = slab_to_ffl + dims["proposed"]["side_wall_upper_doorway"]["head_height_above_kitchen_ffl_mm"]
     # Glass door panel
-    add_box(polys, colors, alphas, cw + ext_t - 5,
+    add_box(polys, colors, alphas, cw - 5,
             kwx_centre_y - door_clear / 2, door_thresh,
             10, door_clear, door_head - door_thresh,
             color="#b8d4e0", alpha=0.9)
     # Red flat arch over the new doorway
-    add_box(polys, colors, alphas, cw + ext_t - 8,
+    add_box(polys, colors, alphas, cw - 8,
             kwx_centre_y - door_clear / 2 - 30, door_head,
             16, door_clear + 60, 100,
             color="#b85a3a", alpha=1.0)
     # Pink highlight rectangle for the new doorway aperture (planning-callout colour)
-    add_box(polys, colors, alphas, cw + ext_t - 2,
+    add_box(polys, colors, alphas, cw - 2,
             kwx_centre_y - door_clear / 2, door_thresh,
             4, door_clear, door_head - door_thresh,
             color="#ff80a0", alpha=0.4)
 
+
+    # ---- RIGHT downpipe on rear wall (Craig confirms exists per photoreal) ----
+    rwdp_x = dims["existing_services"]["downpipe_rear_wall_right"]["position_from_east_corner_mm"]
+    # Down on the COURTYARD-facing side of the south wall (y just > 0)
+    add_box(polys, colors, alphas, rwdp_x, 30, 0,
+            45, 45, parapet,
+            color="#1a1a1a", alpha=1.0)
+
     # ---- L-CORNER DOWNPIPE on east wall (PROPOSED: straight down in corner) ----
-    pipe_x = cw + ext_t + 30
+    pipe_x = cw - 90
     pipe_y = 50   # close to south end (inside L corner)
     add_box(polys, colors, alphas, pipe_x, pipe_y, 0,
             45, 45, parapet,

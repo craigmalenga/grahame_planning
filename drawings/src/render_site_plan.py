@@ -236,24 +236,9 @@ def render_cover_sheet():
         ax.text(col_x[1], y, title, fontsize=8, ha="left")
         ax.text(col_x[3], y, sc, fontsize=8, ha="left")
 
-    # Methodology block
-    method_y = y_start - 6 - len(rows) * row_h - 10
-    ax.text(30, method_y,
-            "REPLICABILITY  — every drawing is generated from a single",
-            fontsize=8, weight="bold")
-    method_lines = [
-        "parametric source (`drawings/dimensions.yaml`). To revise any",
-        "dimension: edit the YAML, re-run `python3 drawings/src/render_all.py`,",
-        "and a fresh PDF + PNG set is produced. Source files are kept in",
-        "the repository for full version control.",
-        "",
-        "STATUS  —  FOR PLANNING (DRAFT).  Several dimensions are marked",
-        "'TBC' in the YAML pending Grahame's site re-measure (see",
-        "`dimension_questions.md`).  Items flagged TBC are clearly noted",
-        "on the drawings where they appear.",
-    ]
-    for i, ln in enumerate(method_lines):
-        ax.text(30, method_y - 5 - i * 4, ln, fontsize=7, ha="left")
+    # Cover sheet kept clean — no internal "replicability" / status blurb
+    # in the body (status is in the title block; replicability is internal
+    # documentation, lives in the repo README not on the planning sheet).
 
     # Status box — top-right of sheet, well clear of the index table + title block
     ax.add_patch(FancyBboxPatch((290, 240), 100, 35,
