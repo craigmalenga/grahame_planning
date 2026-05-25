@@ -57,7 +57,7 @@ def render(dwg_no="06"):
     # Scale 1:20.  Total rise + handrail ~3700 mm -> on sheet that's 185 mm at 1:20.
     # Available height in left zone: 250 mm. Plenty of room.
     scale_el = Scale(20)
-    w_elev = World(ax, scale_el, origin_sheet_xy=(75, 50))
+    w_elev = World(ax, scale_el, origin_sheet_xy=(110, 50))  # moved right for dim clearance
     # Draw elevation centred (base x = 0)
     draw_elevation(ax, w_elev, params, base_x_mm=0, base_y_mm=0)
 

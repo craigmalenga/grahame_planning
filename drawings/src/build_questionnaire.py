@@ -79,12 +79,24 @@ QUESTIONS = [
     ("12", "12_opening_3d.jpg", "Sheet 12 — Internal Opening 3D", [
         ("Q12-1", "Preference on the head detail — squared opening (as shown) vs. arched / segmental?", "", "long"),
     ]),
+    ("REV-C", None, "Rev-C corrections — please confirm", [
+        ("QC-1", "Slab-to-ground-floor FFL: I've used 3000 mm in Rev C (re-derived from your sill heights). Confirm this is correct, or what's the measured value?", "Rev A was 2820 (basement-ceiling figure — wrong). Rev C uses 3000.", "num"),
+        ("QC-2", "Spiral staircase rise: 15 risers × 200 mm = 3000 mm exactly. Does the reclaimed artefact actually have 15 risers carrying the 3000 mm rise, or do we need a different combination?", "previous email suggested 15 pads with 200-210 mm rise each", "long"),
+        ("QC-3", "Building orientation — back wall of house (with the door bay) faces NE. Is this still correct? (We rotate the N arrow 45° on all plans accordingly.)", "yes/no — affects N arrow rotation", "choice"),
+        ("QC-4", "Right-side downpipe on rear wall — is there ACTUALLY one? In Rev A I added one but no source photo shows it. Rev B/C only show the L-corner downpipe. Confirm there's just ONE rear-wall downpipe (L-corner)?", "if there are two please confirm", "choice"),
+        ("QC-5", "Central door width — Rev C uses 820 mm per your '82 cm doorway' email. Confirm? (Rev A had 900.)", "", "num"),
+        ("QC-6", "Side window widths in the door bay — Rev C uses 465 mm each (so arithmetic closes: 25+465+25+820+25+465+25 = 1850 ✓). Confirm or correct.", "", "num"),
+        ("QC-7", "Internal-opening clear width: Rev C uses 1350 mm (front-lounge 2650 − nibs 700+600). Confirm the proposed opening should be that narrow?", "Rev A had 2400 which was the flat envelope not the room width", "num"),
+        ("QC-8", "Shower-room zones: Rev C is 900 (shower) + 500 (WC) + 400 (basin) + 400 (laundry, single front-loader, NOT stacked) + 3 × 100 partitions = 2500 mm exactly. Confirm?", "Rev A was 1000+600+500+600 which overflowed by 300 mm", "long"),
+        ("QC-9", "Handrail termination at top of staircase: should the handrail connect to the wall to the LEFT or to the RIGHT of the new doorway? (Currently we show it terminating at the LEFT edge of the doorway with a newel-post stub.)", "yes/no/preference", "long"),
+    ]),
     ("GEN", None, "General / cross-cutting", [
         ("QG-1", "Heritage Statement / Design & Access Statement — do you have these in draft, or shall we draft from these drawings?", "", "long"),
         ("QG-2", "Are neighbours (No. 18, No. 22) likely to object? Any prior conversations?", "", "long"),
         ("QG-3", "Target submission date to RBKC planning?", "", "short"),
-        ("QG-4", "Photos requested — phone-camera shots of: (a) the LEFT-corner downpipe close-up, (b) the kitchen window from inside, (c) the courtyard slab + drainage, (d) inside corner of the L from below. Upload via WhatsApp.", "we'll re-render with corrections once received", "long"),
-        ("QG-5", "Anything else not covered?", "", "long"),
+        ("QG-4", "Photos requested — phone-camera shots of: (a) the LEFT-corner downpipe close-up, (b) the kitchen window from inside, (c) the courtyard slab + drainage, (d) inside corner of the L from below, (e) the central rear door and 2 flanking sashes (full elevation). Upload via WhatsApp.", "we'll re-render with corrections once received", "long"),
+        ("QG-5", "For the photoreal 3D image — we've included a `Photoreal_Render_Prompt_for_ChatGPT.md` file with 5 ready-to-paste prompts. Do you want to try generating those yourself, or would you prefer we provide the prompts in a different format?", "the prompts use your exact measured dimensions", "long"),
+        ("QG-6", "Anything else not covered?", "", "long"),
     ]),
 ]
 
@@ -185,7 +197,7 @@ li.q textarea { min-height:70px; resize:vertical; }
 
     header_html = (
         f'<header><h1>Hornton Street — Questions for Grahame McGirr</h1>'
-        f'<p>Flat 1, 20 Hornton Street, London W8 4NR · Drawing pack Rev. A.1 · {n_questions} questions</p>'
+        f'<p>Flat 1, 20 Hornton Street, London W8 4NR · Drawing pack Rev. C · {n_questions} questions</p>'
         f'</header>'
     )
 

@@ -120,17 +120,34 @@ def render_site_plan():
                            flat_gf_w * z_per_m, flat_gf_d * z_per_m,
                            fc="#ffe6b3", ec="#aa0000", lw=0.9))
     # Rear courtyard
-    cw = dims["courtyard"]["plan_width_mm"] / 1000
-    cd_ = dims["courtyard"]["plan_depth_mm"] / 1000
-    # The courtyard sits at top-left of the ground-floor footprint (rear-west of plan)
+    # Rear courtyard / lightwell — actually sits to the WEST half of the
+    # rear of the GF footprint per the RES survey (job16873-1).  The
+    # eastern portion of the rear contains the kitchen + bin store /
+    # access steps.  Show the courtyard at the rear-LEFT corner of the GF
+    # rectangle, sized to about 2/3 of the GF width (not the whole width).
+    cw = dims["courtyard"]["plan_width_mm"] / 1000     # 3.25 m
+    cd_ = dims["courtyard"]["plan_depth_mm"] / 1000    # 2.95 m
+    # In the site-plan zoom (schematic): clip displayed width to ~60% of GF
+    # so the diagram doesn't imply the courtyard spans the whole width.
+    cw_disp = min(cw, flat_gf_w * 0.6)
     cz_x = zoom_x + 1
     cz_y = zoom_y + (flat_bs_d - flat_gf_d) * z_per_m / 2 + flat_gf_d * z_per_m - cd_ * z_per_m - 1
     ax.add_patch(Rectangle((cz_x, cz_y),
-                           cw * z_per_m, cd_ * z_per_m,
+                           cw_disp * z_per_m, cd_ * z_per_m,
                            fc="#cce4f0", ec="#0066cc", lw=0.5))
-    ax.text(cz_x + cw * z_per_m / 2, cz_y + cd_ * z_per_m / 2,
-            "Rear courtyard\n(L-shape)",
+    ax.text(cz_x + cw_disp * z_per_m / 2, cz_y + cd_ * z_per_m / 2,
+            f"Rear courtyard\n{cw:.2f} × {cd_:.2f} m\n(L-shape)",
             fontsize=5, ha="center", va="center", color="#0066cc",
+            style="italic")
+    # Adjacent zone (kitchen + bin store) — the rest of the GF rear width
+    ax.add_patch(Rectangle((cz_x + cw_disp * z_per_m, cz_y),
+                           (flat_gf_w - cw_disp) * z_per_m, cd_ * z_per_m,
+                           fc="#ffe8c8", ec="#aa6600", lw=0.4,
+                           linestyle=(0, (2, 2))))
+    ax.text(cz_x + (cw_disp + (flat_gf_w - cw_disp) / 2) * z_per_m,
+            cz_y + cd_ * z_per_m / 2,
+            "Kitchen+\nbin store",
+            fontsize=4.5, ha="center", va="center", color="#aa6600",
             style="italic")
 
     ax.text(zoom_x, zoom_y + flat_bs_d * z_per_m + 4,

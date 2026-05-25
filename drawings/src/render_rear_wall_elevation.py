@@ -30,7 +30,7 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
     white_line = dims["courtyard"]["white_paint_datum_mm"]
     rec_h = dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["rear_reception"]
     gf_ceiling = gf_ffl + rec_h
-    parapet = gf_ceiling + 800
+    parapet = gf_ceiling + 200
     wall_h = parapet
 
     x0, y0 = ox_world, oy_world
@@ -254,6 +254,16 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
             rx = stair_cx_on_wall + math.cos(a) * sp["outer_radius_mm"]
             rxs.append(w.x(rx)); rys.append(w.y(ry))
         ax.plot(rxs, rys, color="#111", lw=0.7, alpha=0.85)
+        # Handrail TERMINATOR — extends from the last handrail point along
+        # the side wall (which appears at x=0, the LEFT edge of this view)
+        # to make clear it doesn't dangle in mid-air.
+        last_x = rxs[-1]
+        last_y = rys[-1]
+        ax.plot([last_x, w.x(0)], [last_y, last_y],
+                color="#111", lw=0.7, alpha=0.85)
+        # Small vertical drop where it meets the wall (newel termination)
+        ax.plot([w.x(0), w.x(0)], [last_y, w.y(y0 + total_rise)],
+                color="#111", lw=0.7, alpha=0.85)
 
         # Annotation — explain the superimposition
         ax.text(*w.p(stair_cx_on_wall, y0 + parapet + 600),
@@ -315,7 +325,7 @@ def draw_rear_wall_elevation(ax, w, dims, proposed=False,
 
 def render(proposed=False, dwg_no="04-A"):
     dims = load_dims()
-    scale = Scale(25)   # Rev C uplift
+    scale = Scale(30)   # Rev C uplift
     title = ("PROPOSED REAR WALL ELEVATION — south wall of courtyard"
              if proposed else
              "EXISTING REAR WALL ELEVATION — south wall of courtyard")

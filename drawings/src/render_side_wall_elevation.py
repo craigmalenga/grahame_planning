@@ -42,7 +42,7 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
     gf_ffl = dims["courtyard"]["slab_to_gf_ffl_mm"]   # 2820
     white_line = dims["courtyard"]["white_paint_datum_mm"]  # 2900
     gf_ceiling = gf_ffl + dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["kitchen"]
-    parapet = gf_ceiling + 800   # estimate of parapet height above ceiling
+    parapet = gf_ceiling + 200   # estimate of parapet height above ceiling
     wall_height = parapet
 
     x0, y0 = ox_world, oy_world
@@ -275,6 +275,20 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
             rx = x0 + stair_cx_on_wall + math.cos(a) * sp["outer_radius_mm"]
             rxs.append(w.x(rx)); rys.append(w.y(ry))
         ax.plot(rxs, rys, color="#111", lw=0.7, alpha=0.85)
+        # Handrail TERMINATOR — extends to the LEFT side of the doorway,
+        # connecting to the wall surface beside the new doorway frame.
+        prop_w = dims["proposed"]["side_wall_upper_doorway"]["clear_width_mm"]
+        door_left_edge = kw_centre_x - prop_w / 2
+        last_x = rxs[-1]
+        last_y = rys[-1]
+        # horizontal stub from spiral end to the doorway's left edge at the
+        # top tread level (= gf_ffl), then a small vertical newel post stub
+        ax.plot([last_x, w.x(x0 + door_left_edge)],
+                [last_y, last_y],
+                color="#111", lw=0.8, alpha=0.85)
+        ax.plot([w.x(x0 + door_left_edge), w.x(x0 + door_left_edge)],
+                [last_y, w.y(y0 + gf_ffl)],
+                color="#111", lw=0.8, alpha=0.85)
         # Annotation
         ax.text(*w.p(x0 + stair_cx_on_wall, y0 + parapet + 200),
                 "PROPOSED spiral staircase shown superimposed\n(semi-transparent — silhouette as seen square-on)",
@@ -326,7 +340,7 @@ def draw_side_wall_elevation(ax, w, dims, proposed=False,
 
 def render(proposed=False, dwg_no="03-A"):
     dims = load_dims()
-    scale = Scale(25)   # Rev C uplift
+    scale = Scale(30)   # Rev C uplift
     title = "PROPOSED SIDE WALL ELEVATION" if proposed else "EXISTING SIDE WALL ELEVATION"
     title += " — kitchen-side, east wall of courtyard"
     from sheet import auto_origin

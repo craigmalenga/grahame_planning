@@ -33,7 +33,7 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
     kitchen_h = dims["flat_envelope"]["ground_floor"]["ceiling_heights_mm"]["kitchen"]
     gf_ceil_rec = gf_ffl + rec_h            # reception ceiling
     gf_ceil_kit = gf_ffl + kitchen_h         # kitchen ceiling
-    parapet = gf_ceil_rec + 600
+    parapet = gf_ceil_rec + 200
     bas_floor = gf_ffl - dims["flat_envelope"]["basement"]["ceiling_heights_mm"]["rear_room"]
     # ^ basement floor = GF FFL minus basement ceiling height (basement under reception)
 
@@ -233,7 +233,7 @@ def draw_section(ax, w, dims, proposed=True, ox=0, oy=0):
 
 def render(proposed=True, dwg_no="05-A"):
     dims = load_dims()
-    scale = Scale(25)   # Rev C uplift
+    scale = Scale(30)   # Rev C uplift
     title = ("PROPOSED COURTYARD SECTION A-A (showing spiral staircase)"
              if proposed else "EXISTING COURTYARD SECTION A-A")
     fig, ax = new_a3_landscape(
@@ -265,8 +265,8 @@ def render(proposed=True, dwg_no="05-A"):
         "   • Ground floor FFL = +3000",
         "   • Kitchen ceiling = +5270",
         "   • Reception ceiling = +6100",
-        "5. Spiral staircase: 14 treads × 201 mm rise =",
-        "   2814 mm total → meets new doorway at GF FFL.",
+        "5. Spiral staircase: 15 risers × 200 mm rise =",
+        "   3000 mm total → meets new doorway at GF FFL.",
         "6. Central pole 3300 mm — extends above landing",
         "   as terminating post / handrail.",
         "7. Base-plate fixed to courtyard slab; top fixed to",

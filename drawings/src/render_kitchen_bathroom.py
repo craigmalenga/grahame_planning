@@ -208,7 +208,7 @@ def draw_kitchen_plan(ax, w, dims, proposed=True, ox=0, oy=0):
 
 def render(proposed=True, dwg_no="08-A"):
     dims = load_dims()
-    scale = Scale(20)   # Rev C uplift for the cramped bathroom strip
+    scale = Scale(25)   # Rev C uplift for the cramped bathroom strip
     title = ("PROPOSED KITCHEN + COMPACT SHOWER-ROOM PLAN"
              if proposed else "EXISTING KITCHEN PLAN")
     fig, ax = new_a3_landscape(
