@@ -56,6 +56,72 @@ def _tbc(ax, x, y, text):
             color=TBC, style="italic")
 
 
+def _stairs(ax, w, x0, y0, x1, y1, n=10, updir="up", along="y", label="STAIR"):
+    """Draw a straight-flight stair: n treads + a direction arrow."""
+    ax.add_patch(Rectangle(w.p(x0, y0), w.s(x1 - x0), w.s(y1 - y0),
+                           fc="#efe9dc", ec=WALL, lw=0.6))
+    if along == "y":
+        for i in range(1, n):
+            yy = y0 + (y1 - y0) * i / n
+            ax.plot([w.x(x0), w.x(x1)], [w.y(yy), w.y(yy)], color=WALL, lw=0.4)
+        ax.annotate("", xy=w.p((x0+x1)/2, y1 - 100 if updir == "up" else y0 + 100),
+                    xytext=w.p((x0+x1)/2, y0 + 100 if updir == "up" else y1 - 100),
+                    arrowprops=dict(arrowstyle="-|>", color=WALL, lw=0.8))
+    else:
+        for i in range(1, n):
+            xx = x0 + (x1 - x0) * i / n
+            ax.plot([w.x(xx), w.x(xx)], [w.y(y0), w.y(y1)], color=WALL, lw=0.4)
+        ax.annotate("", xy=w.p(x1 - 100 if updir == "up" else x0 + 100, (y0+y1)/2),
+                    xytext=w.p(x0 + 100 if updir == "up" else x1 - 100, (y0+y1)/2),
+                    arrowprops=dict(arrowstyle="-|>", color=WALL, lw=0.8))
+    if label:
+        ax.text(*w.p((x0+x1)/2, (y0+y1)/2), label, fontsize=4.5,
+                ha="center", va="center", color="#555", rotation=(90 if along=="y" else 0))
+
+
+def _spiral(ax, w, cx, cy, r=875, n=15):
+    """Spiral staircase plan symbol."""
+    import math
+    ax.add_patch(Circle(w.p(cx, cy), w.s(r), fill=False, ec=WALL, lw=0.7))
+    for i in range(n):
+        a = math.radians(i * (360 / n))
+        ax.plot([w.x(cx), w.x(cx + (r-60)*math.cos(a))],
+                [w.y(cy), w.y(cy + (r-60)*math.sin(a))], color=WALL, lw=0.3)
+    ax.add_patch(Circle(w.p(cx, cy), w.s(45), fc="#111", ec="#000"))
+    # up arrow
+    ax.annotate("", xy=w.p(cx + r*0.7, cy), xytext=w.p(cx - r*0.2, cy),
+                arrowprops=dict(arrowstyle="-|>", color=WALL, lw=0.7))
+
+
+def _door(ax, w, hx, hy, leaf, ang0, sweep=90, color=WALL):
+    """Door swing: hinge at (hx,hy), leaf length, opening from ang0 over sweep."""
+    import math
+    a1 = math.radians(ang0)
+    ax.plot([w.x(hx), w.x(hx + leaf*math.cos(a1))],
+            [w.y(hy), w.y(hy + leaf*math.sin(a1))], color=color, lw=0.7)
+    ax.add_patch(Arc(w.p(hx, hy), w.s(2*leaf), w.s(2*leaf),
+                     angle=0, theta1=ang0, theta2=ang0+sweep,
+                     color=color, lw=0.4, ls=(0,(2,2))))
+
+
+def _bath(ax, w, x0, y0, x1, y1):
+    ax.add_patch(Rectangle(w.p(x0,y0), w.s(x1-x0), w.s(y1-y0), fc="#eef6fb", ec=FIT, lw=0.6))
+    ax.add_patch(Arc(w.p((x0+x1)/2, y0 + (y1-y0)*0.62), w.s((x1-x0)*0.7), w.s((y1-y0)*0.7),
+                     angle=0, theta1=0, theta2=360, color=FIT, lw=0.5))
+    ax.text(*w.p((x0+x1)/2, y0+ (y1-y0)*0.15), "bath", fontsize=4, ha="center", color="#234")
+
+
+def _wc(ax, w, cx, cy, r=180):
+    ax.add_patch(Rectangle(w.p(cx-r*0.7, cy-r), w.s(r*1.4), w.s(r*0.5), fc="#fff", ec=FIT, lw=0.5))
+    ax.add_patch(Circle(w.p(cx, cy+r*0.25), w.s(r*0.7), fc="#fff", ec=FIT, lw=0.5))
+    ax.text(*w.p(cx, cy-r*1.5), "WC", fontsize=4, ha="center", color="#234")
+
+
+def _basin(ax, w, cx, cy, r=200):
+    ax.add_patch(Circle(w.p(cx, cy), w.s(r*0.6), fc="#fff", ec=FIT, lw=0.5))
+    ax.text(*w.p(cx, cy-r), "basin", fontsize=4, ha="center", color="#234")
+
+
 # ============================================================
 # GROUND FLOOR
 # ============================================================
@@ -107,11 +173,13 @@ def ground_floor(proposed: bool):
         _zone(ax, w, 0, y0, 2050, L, "REAR\nLIGHTWELL", "(open)", fc="#dfeef5")
         _zone(ax, w, 2050, y0, W, L, "KITCHEN", "ceiling 2.45 m", fc="#eee7d6")
         _opening(ax, w, 2050, y0 + 900, 2130, y0 + 900 + 660, "kitchen\nwindow", color=FIT)
-        # Communal staircase OUTSIDE demise, right side
-        ax.add_patch(Rectangle(w.p(W + 80, 6600), w.s(1100), w.s(L - 6600),
-                               fc="#ece7da", ec=WALL, lw=0.6, hatch="////"))
-        ax.text(*w.p(W + 630, 6600 + (L - 6600)/2), "COMMUNAL\nSTAIR\n(outside\ndemise)",
+        # Communal staircase OUTSIDE demise, right side (two flights)
+        _stairs(ax, w, W + 80, 6600, W + 1180, 9800, n=9, updir="up", along="y", label="")
+        _stairs(ax, w, W + 80, 10100, W + 1180, L, n=9, updir="down", along="y", label="")
+        ax.text(*w.p(W + 630, 9950), "COMMUNAL STAIR (outside demise)",
                 fontsize=5, ha="center", va="center", color="#666", rotation=90)
+        # door from rear reception out to the communal stair / kitchen
+        _door(ax, w, W, 9000, 800, 180, 80)
         ax.text(*w.p(W/2, -1100),
                 "EXISTING — traced from RES survey job 16873. Demise 4.34 m wide × 13.77 m long. "
                 "Communal stair is outside the demise (right). Lightwells front + rear-left; kitchen rear-right.",
@@ -145,17 +213,21 @@ def ground_floor(proposed: bool):
             ax.text(*w.p(60, yy + 200), seg, fontsize=4, ha="left", color="#888")
 
         # Rear zone: spiral access (left) + back door (mid) + wet room (right)
-        _zone(ax, w, 0, 12500, 1600, L, "SPIRAL\nACCESS", "new door ↓ to lightwell", fc="#dfeef5")
-        # spiral indicated
-        ax.add_patch(Circle(w.p(800, 13100), w.s(780), fill=False, ec=TBC, lw=0.6, ls=(0,(3,2))))
-        ax.text(*w.p(800, 13100), "spiral\nbelow", fontsize=4.5, ha="center", va="center", color=TBC)
+        _zone(ax, w, 0, 12500, 1600, L, "SPIRAL\nACCESS", "new door ↓", fc="#dfeef5")
+        _spiral(ax, w, 800, 13100, r=700)
+        _door(ax, w, 1600, 12700, 700, 180, 80, color=TBC)  # new door to spiral
+        ax.text(*w.p(800, 12560), "spiral down to lightwell", fontsize=4, ha="center", color=TBC)
         _opening(ax, w, 1900, L - 120, 2800, L, "back door")
-        # wet room (right)
-        _zone(ax, w, 2900, 12500, W, L, "SHOWER /\nBATH ROOM", "", fc="#dbe8f0")
+        # wet room (right): shower + basin + bath + washer
+        _zone(ax, w, 2900, 12500, W, L, "SHOWER / BATH RM", "", fc="#dbe8f0")
         _fit(ax, w, 2950, L - 950, 3550, L - 100, "shower")
-        _fit(ax, w, 3600, L - 950, 4000, L - 500, "basin")
-        _fit(ax, w, 2950, 12550, 3900, 13050, "bath")
-        _fit(ax, w, 3950, 12550, W - 60, 13050, "washer\n1.2m")
+        _basin(ax, w, 3800, L - 550)
+        _bath(ax, w, 2950, 12560, 3900, 13050)
+        _fit(ax, w, 3950, 12560, W - 60, 13160, "washer\n(1.2 m bay)", fc="#e8e0d0")
+        # communal stair stays (outside demise, right)
+        _stairs(ax, w, W + 80, 6600, W + 1180, 11000, n=12, updir="up", along="y", label="")
+        ax.text(*w.p(W + 630, 8800), "COMMUNAL STAIR (outside demise)",
+                fontsize=5, ha="center", va="center", color="#666", rotation=90)
 
         ax.text(*w.p(W/2, -700),
                 "PROPOSED layout traced from Grahame's hand sketch (image 19). "
@@ -217,11 +289,13 @@ def basement(proposed: bool):
         _zone(ax, w, 0, y0, W, y0 + 4200, "ROOM", "h 2.76 m")
         y0 += 4200
         # Bathroom (bath + WC + basin), offset left; circulation right
-        _zone(ax, w, 0, y0, 3500, y0 + 2500, "BATHROOM", "bath+WC+basin", fc="#dbe8f0")
-        _fit(ax, w, 150, y0 + 250, 1100, y0 + 2100, "bath")
-        _fit(ax, w, 1300, y0 + 1600, 2000, y0 + 2300, "WC")
-        _fit(ax, w, 2100, y0 + 1700, 2900, y0 + 2300, "basin")
+        _zone(ax, w, 0, y0, 3500, y0 + 2500, "BATHROOM", "", fc="#dbe8f0")
+        _bath(ax, w, 150, y0 + 350, 950, y0 + 2150)
+        _wc(ax, w, 1500, y0 + 1900)
+        _basin(ax, w, 2300, y0 + 1950)
+        # circulation + basement internal stair (per surveyor, mid-right)
         _zone(ax, w, 3500, y0, W, y0 + 2500, "hall", "", fc="#f2eee4")
+        _stairs(ax, w, 4000, y0 - 1800, W - 100, y0 + 200, n=10, updir="up", along="y", label="STAIR UP")
         y0 += 2500
         # Room 2.76
         _zone(ax, w, 0, y0, W, y0 + 5000, "ROOM", "h 2.76 m")
@@ -262,15 +336,8 @@ def basement(proposed: bool):
         _zone(ax, w, (W - 3250)/2, 15600, (W - 3250)/2 + 3250, L,
               "WOOD-DECKED LIGHTWELL", "courtyard 3250 × 2950 — OPEN, no roof", fc="#dfeef5")
         cx, cyc = W/2, 15600 + 1475
-        ax.add_patch(Circle(w.p(cx, cyc), w.s(875), fill=False, ec=WALL, lw=0.8))
-        # spiral treads hint
-        import math
-        for i in range(15):
-            a = math.radians(i * 24)
-            ax.plot([w.x(cx), w.x(cx + 800*math.cos(a))],
-                    [w.y(cyc), w.y(cyc + 800*math.sin(a))], color=WALL, lw=0.3)
-        ax.add_patch(Circle(w.p(cx, cyc), w.s(45), fc="#111", ec="#000"))
-        ax.text(*w.p(cx, cyc - 1150), "reclaimed spiral\n(15×200)", fontsize=4.5, ha="center", va="top", color="#333")
+        _spiral(ax, w, cx, cyc, r=875, n=15)
+        ax.text(*w.p(cx, cyc - 1150), "reclaimed spiral (15 × 200)", fontsize=4.5, ha="center", va="top", color="#333")
         # cupboards rear-right
         _fit(ax, w, (W - 3250)/2 + 3250 + 30, 16000, W - 60, L - 200, "cupboards", fc="#e8ddc8")
 
