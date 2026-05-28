@@ -1,2 +1,6 @@
 drawings/src/__pycache__/
 *.pyc
+
+# OCR intermediate crop images (not needed in repo)
+ocr/*.png
+ocr/crops/
