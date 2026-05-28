@@ -40,6 +40,30 @@ interface AppState {
   // Wall vertex editing — move individual wall endpoints
   updateWallVertex: (roomIndex: number, wallIndex: number, vertex: 'start' | 'end', x: number, y: number) => void;
 
+  // ─── MULTI-FLOOR (named storeys) ────────────────────────
+  // Low-churn model: the active storey's plan stays in `floorPlan` (all
+  // existing room/wall actions keep working). Other storeys are parked in
+  // `floors[]` and swapped in on switch.
+  floors: { id: string; name: string; height: number; data: FloorPlanData }[];
+  activeFloorIndex: number;
+  addFloor: (name?: string, height?: number) => void;
+  duplicateActiveFloor: (name?: string) => void;
+  setActiveFloor: (index: number) => void;
+  renameFloor: (index: number, name: string) => void;
+  setFloorHeight: (index: number, height: number) => void;   // default storey height (metres)
+  removeFloor: (index: number) => void;
+
+  // ─── FREE-STANDING ANGLED WALLS ─────────────────────────
+  // Stored on the active floorPlan.wallSegments — independent of rooms,
+  // any angle. This is the non-rectangular drawing capability.
+  defaultWallThickness: number;                              // metres
+  setDefaultWallThickness: (t: number) => void;
+  addFreeWall: (x1: number, y1: number, x2: number, y2: number, thickness?: number, height?: number) => void;
+  updateFreeWall: (index: number, updates: Partial<{ x1: number; y1: number; x2: number; y2: number; thickness: number; height: number }>) => void;
+  removeFreeWall: (index: number) => void;
+  selectedFreeWallIndex: number | null;
+  setSelectedFreeWallIndex: (i: number | null) => void;
+
   // Doors & windows
   addDoor: (roomIndex: number, door: Omit<DoorData, 'id'>) => void;
   updateDoor: (roomIndex: number, doorId: string, updates: Partial<DoorData>) => void;
@@ -187,8 +211,144 @@ export const useStore = create<AppState>((set) => ({
       windows: r.windows ?? [],
       furniture: r.furniture ?? [],
     }));
-    set({ floorPlan: { ...data, rooms } });
+    const fp = { ...data, rooms, wallSegments: data.wallSegments ?? [] };
+    set((state) => ({
+      floorPlan: fp,
+      // Seed the active storey if floors haven't been set up yet.
+      floors: state.floors && state.floors.length
+        ? state.floors
+        : [{ id: uuidv4(), name: data.name || 'Ground Floor', height: 2.7, data: fp }],
+      activeFloorIndex: state.floors && state.floors.length ? state.activeFloorIndex : 0,
+    }));
   },
+
+  // ─── MULTI-FLOOR ──────────────────────────────────────
+  floors: [],
+  activeFloorIndex: 0,
+  defaultWallThickness: 0.1,                 // 100 mm internal default
+  selectedFreeWallIndex: null,
+  setSelectedFreeWallIndex: (i) => set({ selectedFreeWallIndex: i }),
+  setDefaultWallThickness: (t) => set({ defaultWallThickness: Math.max(0.02, t) }),
+
+  // Save the live floorPlan back into floors[active] before any switch.
+  setActiveFloor: (index) =>
+    set((state) => {
+      if (!state.floorPlan || index === state.activeFloorIndex) return state;
+      const floors = [...state.floors];
+      if (floors[state.activeFloorIndex]) {
+        floors[state.activeFloorIndex] = { ...floors[state.activeFloorIndex], data: state.floorPlan };
+      }
+      const target = floors[index];
+      if (!target) return state;
+      return {
+        floors,
+        activeFloorIndex: index,
+        floorPlan: target.data,
+        selectedRoomIndex: null,
+        selectedWallIndex: null,
+        selectedFreeWallIndex: null,
+      };
+    }),
+
+  addFloor: (name, height) =>
+    set((state) => {
+      const floors = [...state.floors];
+      // park current
+      if (state.floorPlan && floors[state.activeFloorIndex]) {
+        floors[state.activeFloorIndex] = { ...floors[state.activeFloorIndex], data: state.floorPlan };
+      }
+      const h = height ?? 2.7;
+      const blank: FloorPlanData = {
+        name: name || `Floor ${floors.length + 1}`,
+        originalImageUrl: '', width: state.floorPlan?.width ?? 1200,
+        height: state.floorPlan?.height ?? 1200, scale: state.floorPlan?.scale ?? 100,
+        rooms: [], wallSegments: [],
+      };
+      floors.push({ id: uuidv4(), name: blank.name, height: h, data: blank });
+      return {
+        floors, activeFloorIndex: floors.length - 1, floorPlan: blank,
+        selectedRoomIndex: null, selectedWallIndex: null, selectedFreeWallIndex: null,
+      };
+    }),
+
+  duplicateActiveFloor: (name) =>
+    set((state) => {
+      if (!state.floorPlan) return state;
+      const floors = [...state.floors];
+      floors[state.activeFloorIndex] = { ...floors[state.activeFloorIndex], data: state.floorPlan };
+      const copy: FloorPlanData = JSON.parse(JSON.stringify(state.floorPlan));
+      copy.name = name || `${floors[state.activeFloorIndex].name} (copy)`;
+      const h = floors[state.activeFloorIndex]?.height ?? 2.7;
+      floors.push({ id: uuidv4(), name: copy.name, height: h, data: copy });
+      return {
+        floors, activeFloorIndex: floors.length - 1, floorPlan: copy,
+        selectedRoomIndex: null, selectedWallIndex: null, selectedFreeWallIndex: null,
+      };
+    }),
+
+  renameFloor: (index, name) =>
+    set((state) => {
+      const floors = [...state.floors];
+      if (!floors[index]) return state;
+      floors[index] = { ...floors[index], name };
+      return { floors };
+    }),
+
+  setFloorHeight: (index, height) =>
+    set((state) => {
+      const floors = [...state.floors];
+      if (!floors[index]) return state;
+      floors[index] = { ...floors[index], height: Math.max(1.5, height) };
+      return { floors };
+    }),
+
+  removeFloor: (index) =>
+    set((state) => {
+      if (state.floors.length <= 1) return state;   // keep at least one
+      const floors = state.floors.filter((_, i) => i !== index);
+      const newActive = Math.max(0, Math.min(index, floors.length - 1));
+      return {
+        floors, activeFloorIndex: newActive, floorPlan: floors[newActive].data,
+        selectedRoomIndex: null, selectedWallIndex: null, selectedFreeWallIndex: null,
+      };
+    }),
+
+  // ─── FREE-STANDING ANGLED WALLS ───────────────────────
+  addFreeWall: (x1, y1, x2, y2, thickness, height) =>
+    set((state) => {
+      if (!state.floorPlan) return state;
+      const seg = {
+        x1, y1, x2, y2,
+        thickness: thickness ?? state.defaultWallThickness,
+        ...(height != null ? { height } : {}),
+      };
+      const wallSegments = [...(state.floorPlan.wallSegments ?? []), seg];
+      return withHistory(state, 'Add wall', {
+        floorPlan: { ...state.floorPlan, wallSegments },
+        selectedFreeWallIndex: wallSegments.length - 1,
+      });
+    }),
+
+  updateFreeWall: (index, updates) =>
+    set((state) => {
+      if (!state.floorPlan) return state;
+      const wallSegments = [...(state.floorPlan.wallSegments ?? [])];
+      if (!wallSegments[index]) return state;
+      wallSegments[index] = { ...wallSegments[index], ...updates };
+      return withHistory(state, 'Edit wall', {
+        floorPlan: { ...state.floorPlan, wallSegments },
+      });
+    }),
+
+  removeFreeWall: (index) =>
+    set((state) => {
+      if (!state.floorPlan) return state;
+      const wallSegments = (state.floorPlan.wallSegments ?? []).filter((_, i) => i !== index);
+      return withHistory(state, 'Delete wall', {
+        floorPlan: { ...state.floorPlan, wallSegments },
+        selectedFreeWallIndex: null,
+      });
+    }),
 
   selectedRoomIndex: null,
   setSelectedRoomIndex: (index) => set({ selectedRoomIndex: index }),
@@ -403,7 +563,12 @@ export const useStore = create<AppState>((set) => ({
       rooms,
       wallSegments: [],
     };
-    return { floorPlan: fp, viewMode: 'design', selectedRoomIndex: null, undoStack: [], redoStack: [], canUndo: false, canRedo: false };
+    return {
+      floorPlan: fp, viewMode: 'design', selectedRoomIndex: null,
+      floors: [{ id: uuidv4(), name: 'Ground Floor', height: 2.7, data: fp }],
+      activeFloorIndex: 0, selectedFreeWallIndex: null,
+      undoStack: [], redoStack: [], canUndo: false, canRedo: false,
+    };
   }),
 
   isNightMode: false,

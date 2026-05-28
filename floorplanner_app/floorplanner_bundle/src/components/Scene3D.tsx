@@ -96,6 +96,24 @@ export function Scene3D() {
             <RoomMesh key={i} room={room} roomIndex={i} allRooms={floorPlan.rooms} />
           ))}
 
+          {/* Free-standing angled walls (drawn with the Wall tool) */}
+          {(floorPlan.wallSegments ?? []).map((seg, i) => {
+            const dx = seg.x2 - seg.x1, dz = seg.y2 - seg.y1;
+            const len = Math.hypot(dx, dz);
+            if (len < 0.01) return null;
+            const cx = (seg.x1 + seg.x2) / 2;
+            const cz = (seg.y1 + seg.y2) / 2;
+            const angle = Math.atan2(dz, dx);
+            const th = seg.thickness || 0.1;
+            const wh = seg.height ?? 2.7;
+            return (
+              <mesh key={`fw-${i}`} position={[cx, wh / 2, cz]} rotation={[0, -angle, 0]} castShadow receiveShadow>
+                <boxGeometry args={[len, wh, th]} />
+                <meshStandardMaterial color={isNightMode ? '#3a3f48' : '#d9d4c8'} roughness={0.85} />
+              </mesh>
+            );
+          })}
+
           {/* Ground plane */}
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[centerX, -0.05, centerZ]} receiveShadow>
             <planeGeometry args={[200, 200]} />

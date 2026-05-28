@@ -51,7 +51,7 @@ export const FURNITURE_CATALOG: FurnitureCatalogItem[] = [
 
   // Stairs
   { type: 'staircase-straight', name: 'Straight Staircase', category: 'stairs', defaultWidth: 1.0, defaultDepth: 3.0, defaultHeight: 2.7, icon: 'Str' },
-  { type: 'staircase-spiral', name: 'Spiral Staircase', category: 'stairs', defaultWidth: 1.8, defaultDepth: 1.8, defaultHeight: 2.7, icon: 'Spr' },
+  { type: 'staircase-spiral', name: 'Spiral Staircase', category: 'stairs', defaultWidth: 1.8, defaultDepth: 1.8, defaultHeight: 3.0, icon: 'Spr' },
 ];
 
 export function getCatalogItem(type: FurnitureType): FurnitureCatalogItem {

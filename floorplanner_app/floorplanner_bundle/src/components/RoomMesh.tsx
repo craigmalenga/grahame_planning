@@ -140,7 +140,11 @@ export function RoomMesh({ room, roomIndex, allRooms }: RoomMeshProps) {
         key: i,
         position: [centerX + offsetX, 0, centerZ + offsetZ] as [number, number, number],
         rotation: [0, -angle, 0] as [number, number, number],
-        length, height, thickness,
+        length,
+        // Per-wall height override (Craig: vary height wall-by-wall). Falls
+        // back to the room/floor default when not set.
+        height: (wall.height ?? height),
+        thickness,
         doors: doorsOnWall, windows: windowsOnWall,
         wall, isShared: shared.shared,
       };

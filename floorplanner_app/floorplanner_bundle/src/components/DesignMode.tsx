@@ -16,7 +16,7 @@ const COLORS = {
   handle: '#EF4444', handleHover: '#F87171',
 };
 
-type DesignTool = 'select' | 'room' | 'door' | 'window' | 'furniture' | 'wall-split';
+type DesignTool = 'select' | 'room' | 'wall' | 'door' | 'window' | 'furniture' | 'wall-split';
 
 export function DesignMode() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -32,6 +32,12 @@ export function DesignMode() {
     setViewMode, updateWallVertex,
     undo, redo, canUndo, canRedo, duplicateRoom,
     selectedWallIndex, setSelectedWallIndex,
+    // multi-floor
+    floors, activeFloorIndex, addFloor, duplicateActiveFloor, setActiveFloor,
+    renameFloor, setFloorHeight, removeFloor,
+    // free walls
+    defaultWallThickness, addFreeWall, updateFreeWall, removeFreeWall,
+    selectedFreeWallIndex, setSelectedFreeWallIndex,
   } = useStore();
 
   const [offset, setOffset] = useState({ x: 120, y: 120 });
@@ -393,6 +399,56 @@ export function DesignMode() {
       }
     });
 
+    // ─── FREE-STANDING ANGLED WALLS ───────────────────────
+    (floorPlan.wallSegments ?? []).forEach((seg, si) => {
+      const a = worldToScreen(seg.x1, seg.y1);
+      const b = worldToScreen(seg.x2, seg.y2);
+      const sel = si === selectedFreeWallIndex;
+      const thpx = Math.max(3, (seg.thickness || 0.1) * scale);
+      ctx.strokeStyle = sel ? '#2563EB' : '#374151';
+      ctx.lineWidth = thpx;
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      // endpoints
+      ctx.fillStyle = sel ? '#2563EB' : '#6B7280';
+      [a, b].forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill(); });
+      // length label in cm at midpoint
+      const lenM = Math.hypot(seg.x2 - seg.x1, seg.y2 - seg.y1);
+      const mid = worldToScreen((seg.x1 + seg.x2) / 2, (seg.y1 + seg.y2) / 2);
+      ctx.fillStyle = sel ? '#1D4ED8' : '#111827';
+      ctx.font = '11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${Math.round(lenM * 100)} cm`, mid.x, mid.y - thpx / 2 - 4);
+    });
+    ctx.lineCap = 'butt';
+
+    // Live preview while drawing a wall — length cm + angle
+    if (isDrawing && tool === 'wall') {
+      const a = worldToScreen(drawStart.x, drawStart.y);
+      const b = worldToScreen(drawEnd.x, drawEnd.y);
+      ctx.strokeStyle = '#2563EB';
+      ctx.lineWidth = Math.max(3, defaultWallThickness * scale);
+      ctx.lineCap = 'round';
+      ctx.setLineDash([8, 5]);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineCap = 'butt';
+      const dx = drawEnd.x - drawStart.x, dy = drawEnd.y - drawStart.y;
+      const lenCm = Math.round(Math.hypot(dx, dy) * 100);
+      let deg = Math.atan2(-dy, dx) * 180 / Math.PI; // screen y is down
+      if (deg < 0) deg += 360;
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      ctx.fillStyle = '#1D4ED8';
+      ctx.font = 'bold 13px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      const label = `${lenCm} cm  ∠${deg.toFixed(0)}°`;
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.fillRect(mid.x + 8, mid.y - 22, tw + 10, 18);
+      ctx.fillStyle = '#1D4ED8';
+      ctx.fillText(label, mid.x + 13, mid.y - 9);
+    }
+
     // Draw preview (room creation)
     if (isDrawing && tool === 'room') {
       const s1 = worldToScreen(Math.min(drawStart.x, drawEnd.x), Math.min(drawStart.y, drawEnd.y));
@@ -449,7 +505,7 @@ export function DesignMode() {
       ctx.textAlign = 'right';
       ctx.fillText(`${floorPlan.rooms.length} rooms | ${totalArea.toFixed(0)} m² | ${totalDoors} doors | ${totalWindows} windows`, w - 10, h - 10);
     }
-  }, [floorPlan, selectedRoomIndex, offset, zoom, scale, selectedDoorId, selectedWindowId, selectedFurnitureId, isDrawing, drawStart, drawEnd, tool, alignGuides, dragFurniture, dragWallVertex]);
+  }, [floorPlan, selectedRoomIndex, offset, zoom, scale, selectedDoorId, selectedWindowId, selectedFurnitureId, isDrawing, drawStart, drawEnd, tool, alignGuides, dragFurniture, dragWallVertex, selectedFreeWallIndex, defaultWallThickness]);
 
   // Canvas resize
   useEffect(() => {
@@ -529,10 +585,15 @@ export function DesignMode() {
           if (item) updateFurniture(selectedRoomIndex, selectedFurnitureId, { rotation: item.rotation + Math.PI / 4 });
         }
       }
+      if (e.key === 'a' && !e.ctrlKey && !e.metaKey) { setTool('wall'); setIsDrawing(false); }
+      // Delete a selected free wall
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedFreeWallIndex !== null) {
+        removeFreeWall(selectedFreeWallIndex);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [floorPlan, selectedRoomIndex, selectedFurnitureId, selectedDoorId, selectedWindowId]);
+  }, [floorPlan, selectedRoomIndex, selectedFurnitureId, selectedDoorId, selectedWindowId, selectedFreeWallIndex]);
 
   // Handle positions for room resize
   function getHandlePositions(bounds: { minX: number; minY: number; maxX: number; maxY: number }) {
@@ -590,6 +651,24 @@ export function DesignMode() {
     return null;
   }
 
+  // Nearest free-standing wall to a world point (within ~0.25 m). Returns index or null.
+  function findNearestFreeWall(wx: number, wy: number): number | null {
+    if (!floorPlan?.wallSegments?.length) return null;
+    let bestIdx: number | null = null;
+    let bestDist = 0.25; // metres tolerance
+    floorPlan.wallSegments.forEach((s, i) => {
+      const dx = s.x2 - s.x1, dy = s.y2 - s.y1;
+      const len2 = dx * dx + dy * dy;
+      if (len2 === 0) return;
+      let t = ((wx - s.x1) * dx + (wy - s.y1) * dy) / len2;
+      t = Math.max(0, Math.min(1, t));
+      const px = s.x1 + t * dx, py = s.y1 + t * dy;
+      const d = Math.hypot(wx - px, wy - py);
+      if (d < bestDist) { bestDist = d; bestIdx = i; }
+    });
+    return bestIdx;
+  }
+
   function findNearestWall(wx: number, wy: number) {
     if (!floorPlan) return null;
     let best: { roomIndex: number; wallIndex: number; position: number; dist: number } | null = null;
@@ -628,6 +707,15 @@ export function DesignMode() {
       const snapped = { x: snap(world.x), y: snap(world.y) };
       setDrawStart(snapped);
       setDrawEnd(snapped);
+      return;
+    }
+
+    if (tool === 'wall') {
+      // Free angled wall. Snap start to grid (Alt = no snap for true freehand).
+      setIsDrawing(true);
+      const p = e.shiftKey ? world : { x: snap(world.x), y: snap(world.y) };
+      setDrawStart(p);
+      setDrawEnd(p);
       return;
     }
 
@@ -675,6 +763,16 @@ export function DesignMode() {
     }
 
     // Select tool
+    // Free-standing wall selection (click on it)
+    const fwHit = findNearestFreeWall(world.x, world.y);
+    if (fwHit != null) {
+      setSelectedFreeWallIndex(fwHit);
+      setSelectedRoomIndex(null);
+      return;
+    } else if (selectedFreeWallIndex !== null) {
+      setSelectedFreeWallIndex(null);
+    }
+
     // Check wall vertex handles first (for diagonal walls)
     const vertexHit = hitTestWallVertex(world.x, world.y);
     if (vertexHit) {
@@ -775,6 +873,23 @@ export function DesignMode() {
       return;
     }
 
+    if (isDrawing && tool === 'wall') {
+      // Free angle. Shift = ortho-lock to 0/45/90 deg from the start point.
+      let p = { x: world.x, y: world.y };
+      if (e.shiftKey) {
+        const dx = world.x - drawStart.x, dy = world.y - drawStart.y;
+        const ang = Math.atan2(dy, dx);
+        const step = Math.PI / 4; // 45-degree magnets
+        const snapAng = Math.round(ang / step) * step;
+        const len = Math.hypot(dx, dy);
+        p = { x: drawStart.x + Math.cos(snapAng) * len, y: drawStart.y + Math.sin(snapAng) * len };
+      } else {
+        p = { x: snap(world.x), y: snap(world.y) };
+      }
+      setDrawEnd(p);
+      return;
+    }
+
     if (dragHandle && selectedRoomIndex !== null && floorPlan) {
       const room = floorPlan.rooms[selectedRoomIndex];
       let { minX, minY, maxX, maxY } = room.bounds;
@@ -863,6 +978,17 @@ export function DesignMode() {
       return;
     }
 
+    if (isDrawing && tool === 'wall') {
+      setIsDrawing(false);
+      const len = Math.hypot(drawEnd.x - drawStart.x, drawEnd.y - drawStart.y);
+      if (len > 0.05) {
+        addFreeWall(drawStart.x, drawStart.y, drawEnd.x, drawEnd.y, defaultWallThickness);
+        // Chain: next wall starts where this one ended (stay in wall tool).
+        setDrawStart(drawEnd);
+      }
+      return;
+    }
+
     setDragHandle(null);
     setDragFurniture(null);
     setDragDoor(null);
@@ -881,7 +1007,7 @@ export function DesignMode() {
     setFurnitureToPlace(type);
   };
 
-  const cursorStyle = tool === 'room' ? 'crosshair' :
+  const cursorStyle = tool === 'room' || tool === 'wall' ? 'crosshair' :
     tool === 'door' || tool === 'window' || tool === 'furniture' ? 'copy' :
     dragHandle ? 'nwse-resize' : dragWallVertex ? 'move' :
     (dragFurniture || dragDoor || dragWindow) ? 'grabbing' : 'default';
@@ -903,6 +1029,31 @@ export function DesignMode() {
           const rect = canvasRef.current?.getBoundingClientRect();
           if (!rect) return;
           const world = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+
+          // Right-click a FREE WALL → inline numeric editor (length/thickness/height/angle)
+          const fwi = findNearestFreeWall(world.x, world.y);
+          if (fwi != null) {
+            const seg = floorPlan.wallSegments[fwi];
+            setSelectedFreeWallIndex(fwi);
+            const curLen = Math.hypot(seg.x2 - seg.x1, seg.y2 - seg.y1);
+            const lenStr = window.prompt('Wall LENGTH in cm:', String(Math.round(curLen * 100)));
+            if (lenStr == null) return;
+            const newLen = parseFloat(lenStr) / 100;
+            const thStr = window.prompt('Wall THICKNESS in cm:', String(Math.round((seg.thickness || 0.1) * 100)));
+            const htStr = window.prompt('Wall HEIGHT in cm (blank = floor default):',
+              seg.height != null ? String(Math.round(seg.height * 100)) : '');
+            const updates: any = {};
+            if (!isNaN(newLen) && newLen > 0) {
+              const ang = Math.atan2(seg.y2 - seg.y1, seg.x2 - seg.x1);
+              updates.x2 = seg.x1 + Math.cos(ang) * newLen;
+              updates.y2 = seg.y1 + Math.sin(ang) * newLen;
+            }
+            if (thStr != null && thStr !== '' && !isNaN(parseFloat(thStr))) updates.thickness = parseFloat(thStr) / 100;
+            if (htStr != null && htStr !== '') updates.height = parseFloat(htStr) / 100;
+            if (Object.keys(updates).length) updateFreeWall(fwi, updates);
+            return;
+          }
+
           // Check if right-click is on a wall segment — toggle gap
           const hit = findNearestWall(world.x, world.y);
           if (hit) {
@@ -923,10 +1074,39 @@ export function DesignMode() {
       >
         <canvas ref={canvasRef} className="absolute inset-0" />
 
+        {/* Floor bar (named storeys) */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white rounded-xl shadow-lg p-1.5 border border-gray-200 z-10">
+          <span className="text-[10px] font-semibold text-gray-400 px-1">FLOORS</span>
+          {(floors ?? []).map((fl, i) => (
+            <button key={fl.id}
+              onClick={() => setActiveFloor(i)}
+              onDoubleClick={() => {
+                const n = window.prompt('Floor name:', fl.name);
+                if (n != null && n.trim()) renameFloor(i, n.trim());
+              }}
+              title={`${fl.name} — height ${(fl.height * 100).toFixed(0)} cm. Double-click to rename.`}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium ${i === activeFloorIndex ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+              {fl.name}
+            </button>
+          ))}
+          <div className="w-px bg-gray-200 mx-0.5 self-stretch" />
+          <button onClick={() => { const n = window.prompt('New floor name:', `Floor ${(floors?.length ?? 0) + 1}`); const h = window.prompt('Default storey height in cm:', '270'); addFloor(n || undefined, h ? parseFloat(h) / 100 : undefined); }}
+            title="Add a new floor" className="px-2 py-1 rounded-lg text-xs font-medium text-emerald-700 hover:bg-emerald-50">+ Floor</button>
+          <button onClick={() => duplicateActiveFloor()}
+            title="Duplicate this floor (e.g. Existing → Proposed)" className="px-2 py-1 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Duplicate</button>
+          <button onClick={() => { const fl = floors?.[activeFloorIndex]; const h = window.prompt(`Default storey height for "${fl?.name}" in cm:`, String(Math.round((fl?.height ?? 2.7) * 100))); if (h) setFloorHeight(activeFloorIndex, parseFloat(h) / 100); }}
+            title="Set this floor's default storey height" className="px-2 py-1 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Height</button>
+          {(floors?.length ?? 0) > 1 && (
+            <button onClick={() => { if (window.confirm(`Delete floor "${floors[activeFloorIndex]?.name}"?`)) removeFloor(activeFloorIndex); }}
+              title="Delete this floor" className="px-2 py-1 rounded-lg text-xs font-medium text-red-600 hover:bg-red-50">Delete</button>
+          )}
+        </div>
+
         {/* Top toolbar */}
         <div className="absolute top-4 left-4 flex gap-2 bg-white rounded-xl shadow-lg p-2 border border-gray-200">
           <ToolBtn active={tool === 'select'} onClick={() => { setTool('select'); setFurnitureToPlace(null); }} label="Select" kbd="V" />
           <ToolBtn active={tool === 'room'} onClick={() => setTool('room')} label="New Room" kbd="R" />
+          <ToolBtn active={tool === 'wall'} onClick={() => { setTool('wall'); setIsDrawing(false); }} label="Draw Wall" kbd="A" />
           <div className="w-px bg-gray-200" />
           <ToolBtn active={tool === 'door'} onClick={() => setTool('door')} label="Door" kbd="D" />
           <ToolBtn active={tool === 'window'} onClick={() => setTool('window')} label="Window" kbd="W" />
@@ -959,6 +1139,7 @@ export function DesignMode() {
             <span>Ctrl+D: duplicate room</span>
           </>}
           {tool === 'room' && <span>Click and drag to draw a new room. ESC to cancel.</span>}
+          {tool === 'wall' && <span>Click-drag to draw a wall at any angle — length shown live in cm. Walls chain end-to-end. Shift = 45° lock. Right-click a wall to edit length/thickness/height. ESC to stop.</span>}
           {tool === 'door' && <span>Click on any wall to place a door. The closer to the wall, the better.</span>}
           {tool === 'window' && <span>Click on any wall to place a window.</span>}
           {tool === 'furniture' && furnitureToPlace && <span>Click inside a room to place {getCatalogItem(furnitureToPlace).name}.</span>}
