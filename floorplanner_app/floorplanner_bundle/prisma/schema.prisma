@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  floorPlans     FloorPlan[]
+  customTextures CustomTexture[]
+
+  @@map("projects")
+}
+
+model FloorPlan {
+  id               String   @id @default(uuid())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name             String
+  originalImageUrl String
+  processedData    Json?
+  sceneConfig      Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  rooms Room[]
+
+  @@map("floor_plans")
+}
+
+model Room {
+  id            String    @id @default(uuid())
+  floorPlanId   String
+  floorPlan     FloorPlan @relation(fields: [floorPlanId], references: [id], onDelete: Cascade)
+  name          String
+  walls         Json      // [{x1,y1,x2,y2,thickness}]
+  floorY        Float     @default(0)
+  ceilingHeight Float     @default(2.7)
+  showFloor     Boolean   @default(true)
+  showCeiling   Boolean   @default(true)
+
+  wallTexture    String @default("plaster-white")
+  floorTexture   String @default("hardwood-oak")
+  ceilingTexture String @default("plaster-white")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doors   Door[]
+  windows Window[]
+
+  @@map("rooms")
+}
+
+model Door {
+  id            String @id @default(uuid())
+  roomId        String
+  room          Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  wallIndex     Int
+  position      Float  // 0-1 along wall
+  width         Float  @default(0.9)
+  height        Float  @default(2.1)
+  type          String @default("single") // single, double, sliding, french
+  openDirection String @default("inward") // inward, outward
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("doors")
+}
+
+model Window {
+  id         String @id @default(uuid())
+  roomId     String
+  room       Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  wallIndex  Int
+  position   Float // 0-1 along wall
+  width      Float @default(1.2)
+  height     Float @default(1.0)
+  sillHeight Float @default(0.9) // floor to bottom of window
+  type       String @default("double") // single, double, bay, skylight
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("windows")
+}
+
+model TextureLibrary {
+  id       String @id @default(uuid())
+  name     String
+  category String // "wall", "floor", "ceiling"
+  imageUrl String
+  tileSize Float  @default(1.0)
+
+  @@map("texture_library")
+}
+
+model CustomTexture {
+  id        String  @id @default(uuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  category  String  // "wall", "floor", "ceiling"
+  imageData Bytes   // raw image binary stored in DB
+  mimeType  String  @default("image/jpeg")
+  tileSize  Float   @default(1.0)
+
+  createdAt DateTime @default(now())
+
+  @@map("custom_textures")
+}
