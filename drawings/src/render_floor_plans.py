@@ -77,14 +77,45 @@ def ground_floor(proposed: bool):
     _wall_rect(ax, w, 0, 0, W, L)
 
     if not proposed:
-        # EXISTING (from surveyor job16873) — front (bottom) to rear (top)
-        _zone(ax, w, 0, 0, W, 5700, "FRONT LOUNGE", "ceiling 3.28 m")
-        _zone(ax, w, 0, 5700, W, 11000, "REAR RECEPTION", "ceiling 3.28 m")
-        _zone(ax, w, 0, 11000, W, 12600, "KITCHEN", "ceiling 2.45 m", fc="#eee7d6")
-        _zone(ax, w, 0, 12600, W, L, "REAR LIGHTWELL", "(existing, open)", fc="#dfeef5")
-        ax.text(*w.p(W/2, -700), "Existing layout per RES survey job 16873 (1:150). "
-                "Dimensions: 4.34 m wide × 13.77 m long.",
-                fontsize=6, ha="center", va="top", style="italic", color="#555")
+        # EXISTING — faithfully traced from RES survey job 16873.
+        # Demise ~4.34 wide. Communal staircase runs down the RIGHT side
+        # OUTSIDE the demise. Lightwells are offset, NOT full-width bands.
+        # Front (bottom) -> rear (top):
+        #   front lightwell (steps) / front lounge / rear reception /
+        #   rear lightwell (LEFT) + kitchen 2.45 (RIGHT)
+        FL_LW = 1500       # front lightwell depth
+        LOUNGE = 5200
+        RECEP = 4400
+        REAR = L - (FL_LW + LOUNGE + RECEP)   # rear band depth (~2670)
+        y0 = 0
+        # Front lightwell
+        _zone(ax, w, 0, y0, W, FL_LW, "FRONT LIGHTWELL", "(open, steps down)", fc="#dfeef5")
+        ax.add_patch(Rectangle(w.p(400, 300), w.s(1500), w.s(700),
+                               fill=False, ec=WALL, lw=0.5))
+        ax.text(*w.p(1150, 650), "steps", fontsize=4.5, ha="center", va="center", color="#555")
+        y0 += FL_LW
+        # Front lounge
+        _zone(ax, w, 0, y0, W, y0 + LOUNGE, "FRONT LOUNGE", "ceiling 3.28 m")
+        _opening(ax, w, 2600, y0, 3300, y0 + 80, "front door (to hall/stair)")
+        y0 += LOUNGE
+        # existing opening between lounge and reception
+        _opening(ax, w, 1500, y0 - 40, 2600, y0 + 40, "existing opening", color=FIT)
+        # Rear reception
+        _zone(ax, w, 0, y0, W, y0 + RECEP, "REAR RECEPTION", "ceiling 3.28 m")
+        y0 += RECEP
+        # Rear band: rear lightwell (left) + kitchen (right)
+        _zone(ax, w, 0, y0, 2050, L, "REAR\nLIGHTWELL", "(open)", fc="#dfeef5")
+        _zone(ax, w, 2050, y0, W, L, "KITCHEN", "ceiling 2.45 m", fc="#eee7d6")
+        _opening(ax, w, 2050, y0 + 900, 2130, y0 + 900 + 660, "kitchen\nwindow", color=FIT)
+        # Communal staircase OUTSIDE demise, right side
+        ax.add_patch(Rectangle(w.p(W + 80, 6600), w.s(1100), w.s(L - 6600),
+                               fc="#ece7da", ec=WALL, lw=0.6, hatch="////"))
+        ax.text(*w.p(W + 630, 6600 + (L - 6600)/2), "COMMUNAL\nSTAIR\n(outside\ndemise)",
+                fontsize=5, ha="center", va="center", color="#666", rotation=90)
+        ax.text(*w.p(W/2, -1100),
+                "EXISTING — traced from RES survey job 16873. Demise 4.34 m wide × 13.77 m long. "
+                "Communal stair is outside the demise (right). Lightwells front + rear-left; kitchen rear-right.",
+                fontsize=5.5, ha="center", va="top", style="italic", color="#555")
     else:
         # PROPOSED (from hand sketch image 19)
         # Front lounge
@@ -166,14 +197,46 @@ def basement(proposed: bool):
     _wall_rect(ax, w, 0, 0, W, L)
 
     if not proposed:
-        _zone(ax, w, 0, 0, W, 2200, "VAULTS (under pavement)", "h 1.89 m", fc="#e6e0d0")
-        _zone(ax, w, 0, 2200, W, 7000, "FRONT ROOM", "h 2.76 m")
-        _zone(ax, w, 0, 7000, W, 9800, "BATHROOM / SERVICE", "h 2.76 m", fc="#eee7d6")
-        _zone(ax, w, 0, 9800, W, 15800, "REAR ROOM", "h 2.82 m")
-        _zone(ax, w, 0, 15800, W, L, "REAR PATIO / LIGHTWELL", "(existing, open)", fc="#dfeef5")
-        ax.text(*w.p(W/2, -900), "Existing layout per RES survey job 16873. "
-                "5.70 m wide × 19.06 m long (incl. under-pavement vaults).",
-                fontsize=6, ha="center", va="top", style="italic", color="#555")
+        # EXISTING — faithfully traced from RES survey job 16873.
+        # Front (bottom) -> rear (top): under-pavement vaults + WC room (1.89),
+        # front patio (offset left, steps), room 2.76, bathroom (bath+WC+basin),
+        # room 2.76, rear room 2.82, rear patio (left).
+        y0 = 0
+        # Vaults under pavement + WC room (right)
+        _zone(ax, w, 0, y0, 2850, 2000, "VAULT", "h 1.89 m", fc="#e6e0d0")
+        _zone(ax, w, 2850, y0, 4400, 2000, "VAULT", "h 1.89 m", fc="#e6e0d0")
+        _zone(ax, w, 4400, y0, W, 2200, "WC", "h 1.89 m", fc="#eee7d6")
+        ax.annotate("(under\npavement)", xy=w.p(1400, 1000), xytext=(w.x(1400), w.y(1000)),
+                    fontsize=4.5, ha="center", va="center", color="#777")
+        y0 = 2200
+        # Front patio (offset left, steps)
+        _zone(ax, w, 0, y0, 3500, y0 + 1800, "FRONT PATIO", "(open, steps)", fc="#dfeef5")
+        _zone(ax, w, 3500, y0, W, y0 + 1800, "store", "", fc="#eee7d6")
+        y0 += 1800
+        # Room 2.76
+        _zone(ax, w, 0, y0, W, y0 + 4200, "ROOM", "h 2.76 m")
+        y0 += 4200
+        # Bathroom (bath + WC + basin), offset left; circulation right
+        _zone(ax, w, 0, y0, 3500, y0 + 2500, "BATHROOM", "bath+WC+basin", fc="#dbe8f0")
+        _fit(ax, w, 150, y0 + 250, 1100, y0 + 2100, "bath")
+        _fit(ax, w, 1300, y0 + 1600, 2000, y0 + 2300, "WC")
+        _fit(ax, w, 2100, y0 + 1700, 2900, y0 + 2300, "basin")
+        _zone(ax, w, 3500, y0, W, y0 + 2500, "hall", "", fc="#f2eee4")
+        y0 += 2500
+        # Room 2.76
+        _zone(ax, w, 0, y0, W, y0 + 5000, "ROOM", "h 2.76 m")
+        y0 += 5000
+        # Rear room 2.82 + rear patio (left)
+        rear_room_top = min(y0 + 1800, L)
+        _zone(ax, w, 0, y0, W, rear_room_top, "REAR ROOM", "h 2.82 m")
+        y0 = rear_room_top
+        if y0 < L:
+            _zone(ax, w, 0, y0, 3250, L, "REAR PATIO /\nLIGHTWELL", "(open)", fc="#dfeef5")
+            _zone(ax, w, 3250, y0, W, L, "store", "", fc="#eee7d6")
+        ax.text(*w.p(W/2, -1300),
+                "EXISTING — traced from RES survey job 16873. 5.70 m wide × 19.06 m long "
+                "(incl. under-pavement vaults). Patios front + rear (offset); bathroom mid.",
+                fontsize=5.5, ha="center", va="top", style="italic", color="#555")
     else:
         # PROPOSED (hand sketch image 18) — front (bottom) → rear (top)
         # Vaults + toilet + to-tank
