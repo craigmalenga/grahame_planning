@@ -36,7 +36,7 @@ export function DesignMode() {
     floors, activeFloorIndex, addFloor, duplicateActiveFloor, setActiveFloor,
     renameFloor, setFloorHeight, removeFloor,
     // free walls
-    defaultWallThickness, addFreeWall, updateFreeWall, removeFreeWall,
+    defaultWallThickness, setDefaultWallThickness, addFreeWall, updateFreeWall, removeFreeWall,
     selectedFreeWallIndex, setSelectedFreeWallIndex,
   } = useStore();
 
@@ -51,6 +51,9 @@ export function DesignMode() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawStart, setDrawStart] = useState({ x: 0, y: 0 });
   const [drawEnd, setDrawEnd] = useState({ x: 0, y: 0 });
+  // Reset transient drawing state when the active floor changes (store
+  // can't touch component-local state) so no phantom preview carries over.
+  useEffect(() => { setIsDrawing(false); }, [activeFloorIndex]);
   const [dragHandle, setDragHandle] = useState<{ roomIndex: number; handle: string } | null>(null);
   const [dragFurniture, setDragFurniture] = useState<{ roomIndex: number; itemId: string } | null>(null);
   const [dragDoor, setDragDoor] = useState<{ roomIndex: number; doorId: string; wallIndex: number } | null>(null);
@@ -655,7 +658,7 @@ export function DesignMode() {
   function findNearestFreeWall(wx: number, wy: number): number | null {
     if (!floorPlan?.wallSegments?.length) return null;
     let bestIdx: number | null = null;
-    let bestDist = 0.25; // metres tolerance
+    let bestDist = 12 / scale; // ~12 px tolerance, zoom-independent
     floorPlan.wallSegments.forEach((s, i) => {
       const dx = s.x2 - s.x1, dy = s.y2 - s.y1;
       const len2 = dx * dx + dy * dy;
@@ -711,11 +714,27 @@ export function DesignMode() {
     }
 
     if (tool === 'wall') {
-      // Free angled wall. Snap start to grid (Alt = no snap for true freehand).
-      setIsDrawing(true);
-      const p = e.shiftKey ? world : { x: snap(world.x), y: snap(world.y) };
-      setDrawStart(p);
-      setDrawEnd(p);
+      // Click-to-place polyline: 1st click sets the anchor, each subsequent
+      // click commits a wall from the anchor to the click and re-anchors
+      // there (true chaining). Shift = 45-deg lock. Double-click / ESC ends.
+      const lockShift = e.shiftKey && isDrawing;
+      let p = { x: snap(world.x), y: snap(world.y) };
+      if (lockShift) {
+        const dx = world.x - drawStart.x, dy = world.y - drawStart.y;
+        const step = Math.PI / 4;
+        const ang = Math.round(Math.atan2(dy, dx) / step) * step;
+        const len = Math.hypot(dx, dy);
+        p = { x: drawStart.x + Math.cos(ang) * len, y: drawStart.y + Math.sin(ang) * len };
+      }
+      if (!isDrawing) {
+        setIsDrawing(true);
+        setDrawStart(p);
+        setDrawEnd(p);
+      } else if (Math.hypot(p.x - drawStart.x, p.y - drawStart.y) > 0.05) {
+        addFreeWall(drawStart.x, drawStart.y, p.x, p.y, defaultWallThickness);
+        setDrawStart(p);
+        setDrawEnd(p);
+      }
       return;
     }
 
@@ -763,16 +782,6 @@ export function DesignMode() {
     }
 
     // Select tool
-    // Free-standing wall selection (click on it)
-    const fwHit = findNearestFreeWall(world.x, world.y);
-    if (fwHit != null) {
-      setSelectedFreeWallIndex(fwHit);
-      setSelectedRoomIndex(null);
-      return;
-    } else if (selectedFreeWallIndex !== null) {
-      setSelectedFreeWallIndex(null);
-    }
-
     // Check wall vertex handles first (for diagonal walls)
     const vertexHit = hitTestWallVertex(world.x, world.y);
     if (vertexHit) {
@@ -785,6 +794,17 @@ export function DesignMode() {
     if (handleHit) {
       setDragHandle(handleHit);
       return;
+    }
+
+    // Free-standing wall selection — AFTER room vertex/handle tests so an
+    // overlapping free wall can't block selecting a room's handles.
+    const fwHit = findNearestFreeWall(world.x, world.y);
+    if (fwHit != null) {
+      setSelectedFreeWallIndex(fwHit);
+      setSelectedRoomIndex(null);
+      return;
+    } else if (selectedFreeWallIndex !== null) {
+      setSelectedFreeWallIndex(null);
     }
 
     // Check doors/windows first (click near a door/window to select it and start drag)
@@ -979,13 +999,8 @@ export function DesignMode() {
     }
 
     if (isDrawing && tool === 'wall') {
-      setIsDrawing(false);
-      const len = Math.hypot(drawEnd.x - drawStart.x, drawEnd.y - drawStart.y);
-      if (len > 0.05) {
-        addFreeWall(drawStart.x, drawStart.y, drawEnd.x, drawEnd.y, defaultWallThickness);
-        // Chain: next wall starts where this one ended (stay in wall tool).
-        setDrawStart(drawEnd);
-      }
+      // Polyline commits on mousedown (click-to-place); mouseup is a no-op
+      // so a click doesn't double-add. Double-click / ESC ends the chain.
       return;
     }
 
@@ -1022,6 +1037,7 @@ export function DesignMode() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onDoubleClick={() => { if (tool === 'wall') setIsDrawing(false); }}
         onWheel={handleWheel}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -1107,6 +1123,16 @@ export function DesignMode() {
           <ToolBtn active={tool === 'select'} onClick={() => { setTool('select'); setFurnitureToPlace(null); }} label="Select" kbd="V" />
           <ToolBtn active={tool === 'room'} onClick={() => setTool('room')} label="New Room" kbd="R" />
           <ToolBtn active={tool === 'wall'} onClick={() => { setTool('wall'); setIsDrawing(false); }} label="Draw Wall" kbd="A" />
+          {tool === 'wall' && (
+            <label className="flex items-center gap-1 text-[11px] text-gray-600 px-1" title="Default thickness for new walls (cm)">
+              thick
+              <input type="number" min={2} max={60} step={1}
+                value={Math.round(defaultWallThickness * 100)}
+                onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v)) setDefaultWallThickness(v / 100); }}
+                className="w-12 px-1 py-0.5 border border-gray-300 rounded text-xs" />
+              cm
+            </label>
+          )}
           <div className="w-px bg-gray-200" />
           <ToolBtn active={tool === 'door'} onClick={() => setTool('door')} label="Door" kbd="D" />
           <ToolBtn active={tool === 'window'} onClick={() => setTool('window')} label="Window" kbd="W" />
@@ -1139,7 +1165,7 @@ export function DesignMode() {
             <span>Ctrl+D: duplicate room</span>
           </>}
           {tool === 'room' && <span>Click and drag to draw a new room. ESC to cancel.</span>}
-          {tool === 'wall' && <span>Click-drag to draw a wall at any angle — length shown live in cm. Walls chain end-to-end. Shift = 45° lock. Right-click a wall to edit length/thickness/height. ESC to stop.</span>}
+          {tool === 'wall' && <span>Click to drop the start point, click again for each corner — walls chain at any angle and the live length shows in cm. Shift = 45° lock. Double-click or ESC to finish. Right-click a wall to edit length/thickness/height; click then Delete to remove.</span>}
           {tool === 'door' && <span>Click on any wall to place a door. The closer to the wall, the better.</span>}
           {tool === 'window' && <span>Click on any wall to place a window.</span>}
           {tool === 'furniture' && furnitureToPlace && <span>Click inside a room to place {getCatalogItem(furnitureToPlace).name}.</span>}

@@ -52,6 +52,8 @@ interface AppState {
   renameFloor: (index: number, name: string) => void;
   setFloorHeight: (index: number, height: number) => void;   // default storey height (metres)
   removeFloor: (index: number) => void;
+  loadFloors: (floors: { id: string; name: string; height: number; data: FloorPlanData }[], activeFloorIndex: number) => void;
+  getFloorsForSave: () => { floors: { id: string; name: string; height: number; data: FloorPlanData }[]; activeFloorIndex: number };
 
   // ─── FREE-STANDING ANGLED WALLS ─────────────────────────
   // Stored on the active floorPlan.wallSegments — independent of rooms,
@@ -195,7 +197,7 @@ function withHistory(state: AppState, label: string, mutation: Partial<AppState>
   return { ...pushHistory(state, label), ...mutation };
 }
 
-export const useStore = create<AppState>((set) => ({
+export const useStore = create<AppState>((set, get) => ({
   viewMode: 'upload',
   setViewMode: (mode) => set({ viewMode: mode }),
   controlMode: 'orbit',
@@ -212,14 +214,45 @@ export const useStore = create<AppState>((set) => ({
       furniture: r.furniture ?? [],
     }));
     const fp = { ...data, rooms, wallSegments: data.wallSegments ?? [] };
-    set((state) => ({
+    // setFloorPlan is only called on load/import → ALWAYS reset the floor
+    // stack to a single seeded storey + clear history (fixes stale-floors
+    // bug). Multi-floor projects then call loadFloors() right after to
+    // restore the full stack.
+    set({
       floorPlan: fp,
-      // Seed the active storey if floors haven't been set up yet.
-      floors: state.floors && state.floors.length
-        ? state.floors
-        : [{ id: uuidv4(), name: data.name || 'Ground Floor', height: 2.7, data: fp }],
-      activeFloorIndex: state.floors && state.floors.length ? state.activeFloorIndex : 0,
-    }));
+      floors: [{ id: uuidv4(), name: data.name || 'Ground Floor', height: 2.7, data: fp }],
+      activeFloorIndex: 0,
+      selectedFreeWallIndex: null, selectedRoomIndex: null, selectedWallIndex: null,
+      undoStack: [], redoStack: [], canUndo: false, canRedo: false,
+    });
+  },
+
+  // Restore a full multi-floor stack after setFloorPlan (used by Load).
+  loadFloors: (floors, activeFloorIndex) =>
+    set(() => {
+      if (!floors || !floors.length) return {};
+      const idx = Math.max(0, Math.min(activeFloorIndex ?? 0, floors.length - 1));
+      return {
+        floors: floors.map(f => ({ ...f, id: f.id || uuidv4() })),
+        activeFloorIndex: idx,
+        floorPlan: floors[idx].data,
+        undoStack: [], redoStack: [], canUndo: false, canRedo: false,
+        selectedRoomIndex: null, selectedWallIndex: null, selectedFreeWallIndex: null,
+      };
+    }),
+
+  // Park the live plan into floors[active] and return a serialisable copy
+  // of the whole stack (used by Save / autosave).
+  getFloorsForSave: () => {
+    const s = get();
+    if (!s.floors?.length) return { floors: [], activeFloorIndex: 0 };
+    const floors = s.floors.map((f, i) =>
+      i === s.activeFloorIndex && s.floorPlan ? { ...f, data: s.floorPlan } : f
+    );
+    return {
+      floors: JSON.parse(JSON.stringify(floors)),
+      activeFloorIndex: s.activeFloorIndex,
+    };
   },
 
   // ─── MULTI-FLOOR ──────────────────────────────────────
@@ -247,6 +280,9 @@ export const useStore = create<AppState>((set) => ({
         selectedRoomIndex: null,
         selectedWallIndex: null,
         selectedFreeWallIndex: null,
+        // History is per-storey; clear it on switch so an undo can't write
+        // one floor's snapshot onto another.
+        undoStack: [], redoStack: [], canUndo: false, canRedo: false,
       };
     }),
 
@@ -268,6 +304,7 @@ export const useStore = create<AppState>((set) => ({
       return {
         floors, activeFloorIndex: floors.length - 1, floorPlan: blank,
         selectedRoomIndex: null, selectedWallIndex: null, selectedFreeWallIndex: null,
+        undoStack: [], redoStack: [], canUndo: false, canRedo: false,
       };
     }),
 
@@ -275,7 +312,9 @@ export const useStore = create<AppState>((set) => ({
     set((state) => {
       if (!state.floorPlan) return state;
       const floors = [...state.floors];
-      floors[state.activeFloorIndex] = { ...floors[state.activeFloorIndex], data: state.floorPlan };
+      if (floors[state.activeFloorIndex]) {
+        floors[state.activeFloorIndex] = { ...floors[state.activeFloorIndex], data: state.floorPlan };
+      }
       const copy: FloorPlanData = JSON.parse(JSON.stringify(state.floorPlan));
       copy.name = name || `${floors[state.activeFloorIndex].name} (copy)`;
       const h = floors[state.activeFloorIndex]?.height ?? 2.7;
@@ -283,6 +322,7 @@ export const useStore = create<AppState>((set) => ({
       return {
         floors, activeFloorIndex: floors.length - 1, floorPlan: copy,
         selectedRoomIndex: null, selectedWallIndex: null, selectedFreeWallIndex: null,
+        undoStack: [], redoStack: [], canUndo: false, canRedo: false,
       };
     }),
 
@@ -310,6 +350,7 @@ export const useStore = create<AppState>((set) => ({
       return {
         floors, activeFloorIndex: newActive, floorPlan: floors[newActive].data,
         selectedRoomIndex: null, selectedWallIndex: null, selectedFreeWallIndex: null,
+        undoStack: [], redoStack: [], canUndo: false, canRedo: false,
       };
     }),
 

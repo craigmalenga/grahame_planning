@@ -24,15 +24,27 @@ export function SaveLoadPanel() {
 
   const refreshProjects = () => setProjects(listProjects());
 
-  const buildSavedProject = (): SavedProject => ({
-    version: '1.0',
-    name: floorPlan?.name || 'Untitled',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    floorPlan: floorPlan!,
-    sceneConfig,
-    customTextures,
-  });
+  const buildSavedProject = (): SavedProject => {
+    const { floors, activeFloorIndex } = useStore.getState().getFloorsForSave();
+    return {
+      version: '1.1',
+      name: floorPlan?.name || 'Untitled',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      floorPlan: floorPlan!,
+      floors,                 // full multi-floor stack (v1.1+)
+      activeFloorIndex,
+      sceneConfig,
+      customTextures,
+    };
+  };
+
+  // Restore the full floor stack after the single-floorPlan load.
+  const restoreFloors = (project: SavedProject) => {
+    if (project.floors && project.floors.length) {
+      useStore.getState().loadFloors(project.floors, project.activeFloorIndex ?? 0);
+    }
+  };
 
   const handleSave = () => {
     if (!floorPlan) return;
@@ -53,6 +65,7 @@ export function SaveLoadPanel() {
     try {
       const project = await importProjectFromFile(file);
       setFloorPlan(project.floorPlan);
+      restoreFloors(project);
       updateSceneConfig(project.sceneConfig);
       project.customTextures?.forEach(t => addCustomTexture(t));
       setViewMode('design');
@@ -66,6 +79,7 @@ export function SaveLoadPanel() {
     const project = loadProject(id);
     if (!project) return;
     setFloorPlan(project.floorPlan);
+    restoreFloors(project);
     updateSceneConfig(project.sceneConfig);
     project.customTextures?.forEach(t => addCustomTexture(t));
     setSavedProjectId(id);
@@ -81,6 +95,7 @@ export function SaveLoadPanel() {
     const data = loadAutoSave();
     if (!data) return;
     setFloorPlan(data.floorPlan);
+    restoreFloors(data);
     updateSceneConfig(data.sceneConfig);
     data.customTextures?.forEach(t => addCustomTexture(t));
     setViewMode('design');

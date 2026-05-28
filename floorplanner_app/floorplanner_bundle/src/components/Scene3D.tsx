@@ -105,7 +105,7 @@ export function Scene3D() {
             const cz = (seg.y1 + seg.y2) / 2;
             const angle = Math.atan2(dz, dx);
             const th = seg.thickness || 0.1;
-            const wh = seg.height ?? 2.7;
+            const wh = seg.height ?? activeFloorHeight;
             return (
               <mesh key={`fw-${i}`} position={[cx, wh / 2, cz]} rotation={[0, -angle, 0]} castShadow receiveShadow>
                 <boxGeometry args={[len, wh, th]} />

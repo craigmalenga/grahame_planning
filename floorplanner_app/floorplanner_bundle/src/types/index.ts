@@ -161,7 +161,10 @@ export interface SavedProject {
   name: string;
   createdAt: string;
   updatedAt: string;
-  floorPlan: FloorPlanData;
+  floorPlan: FloorPlanData;                 // active storey (back-compat)
+  // v1.1+: full multi-floor stack. Optional so v1.0 files still load.
+  floors?: { id: string; name: string; height: number; data: FloorPlanData }[];
+  activeFloorIndex?: number;
   sceneConfig: SceneConfig;
   customTextures: TextureInfo[];
 }

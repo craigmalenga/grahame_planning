@@ -7,12 +7,13 @@ export function Header() {
 
   const handleQuickSave = () => {
     if (!floorPlan) return;
+    const { floors, activeFloorIndex } = useStore.getState().getFloorsForSave();
     const project: SavedProject = {
-      version: '1.0',
+      version: '1.1',
       name: floorPlan.name || 'Untitled',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      floorPlan,
+      floorPlan, floors, activeFloorIndex,
       sceneConfig,
       customTextures,
     };
@@ -22,12 +23,13 @@ export function Header() {
 
   const handleExport = () => {
     if (!floorPlan) return;
+    const { floors, activeFloorIndex } = useStore.getState().getFloorsForSave();
     exportProjectToFile({
-      version: '1.0',
+      version: '1.1',
       name: floorPlan.name || 'Untitled',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      floorPlan,
+      floorPlan, floors, activeFloorIndex,
       sceneConfig,
       customTextures,
     });
